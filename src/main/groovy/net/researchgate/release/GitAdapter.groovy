@@ -34,8 +34,8 @@ class GitAdapter extends BaseScmAdapter {
         def pushToRemote = 'origin' // needs to be def as can be boolean or string
         def pushOptions = []
         boolean signTag = false
-        
-        /** @deprecated Remove in version 3.0 */
+
+        /** @deprecated Remove in version 3.0  */
         @Deprecated
         boolean pushToCurrentBranch = false
         String pushToBranchPrefix
@@ -65,7 +65,7 @@ class GitAdapter extends BaseScmAdapter {
     @Override
     boolean isSupported(File directory) {
         if (!directory.list().grep('.git')) {
-            return directory.parentFile? isSupported(directory.parentFile) : false
+            return directory.parentFile ? isSupported(directory.parentFile) : false
         }
 
         workingDirectory = directory
@@ -76,7 +76,7 @@ class GitAdapter extends BaseScmAdapter {
     void init() {
         if (extension.git.requireBranch) {
             if (!(workingBranch ==~ extension.git.requireBranch)) {
-                throw new GradleException("Current Git branch is \"$workingBranch\" and not \"${ extension.git.requireBranch }\".")
+                throw new GradleException("Current Git branch is \"$workingBranch\" and not \"${extension.git.requireBranch}\".")
             }
         }
     }
@@ -87,12 +87,12 @@ class GitAdapter extends BaseScmAdapter {
 
         if (status[UNVERSIONED]) {
             warnOrThrow(extension.failOnUnversionedFiles,
-                    (['You have unversioned files:', LINE, * status[UNVERSIONED], LINE] as String[]).join('\n'))
+                    (['You have unversioned files:', LINE, *status[UNVERSIONED], LINE] as String[]).join('\n'))
         }
 
         if (status[UNCOMMITTED]) {
             warnOrThrow(extension.failOnCommitNeeded,
-                    (['You have uncommitted files:', LINE, * status[UNCOMMITTED], LINE] as String[]).join('\n'))
+                    (['You have uncommitted files:', LINE, *status[UNCOMMITTED], LINE] as String[]).join('\n'))
         }
     }
 
@@ -190,11 +190,11 @@ class GitAdapter extends BaseScmAdapter {
 
     private String gitCurrentBranch() {
         def matches = exec(['git', 'branch', '--no-color'], directory: workingDirectory).readLines().grep(~/\s*\*.*/)
-		if (!matches.isEmpty()) {
-			matches[0].trim() - (~/^\*\s+/)
-		} else {
-			throw new GradleException('Error, this repository is empty.')
-		}
+        if (!matches.isEmpty()) {
+            matches[0].trim() - (~/^\*\s+/)
+        } else {
+            throw new GradleException('Error, this repository is empty.')
+        }
     }
 
     private Map<String, List<String>> gitStatus() {

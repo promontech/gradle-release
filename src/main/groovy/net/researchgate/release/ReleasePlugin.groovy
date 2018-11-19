@@ -43,72 +43,72 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             startParameter = project.getGradle().startParameter.newInstance()
 
             tasks = [
-                "${p}createScmAdapter" as String,
-                "${p}initScmAdapter" as String,
-                "${p}checkCommitNeeded" as String,
-                "${p}checkUpdateNeeded" as String,
-                "${p}checkoutMergeToReleaseBranch" as String,
-                "${p}unSnapshotVersion" as String,
-                "${p}confirmReleaseVersion" as String,
-                "${p}checkSnapshotDependencies" as String,
-                "${p}runBuildTasks" as String,
-                "${p}preTagCommit" as String,
-                "${p}createReleaseTag" as String,
-                "${p}checkoutMergeFromReleaseBranch" as String,
-                "${p}updateVersion" as String,
-                "${p}commitNewVersion" as String
+                    "${p}createScmAdapter" as String,
+                    "${p}initScmAdapter" as String,
+                    "${p}checkCommitNeeded" as String,
+                    "${p}checkUpdateNeeded" as String,
+                    "${p}checkoutMergeToReleaseBranch" as String,
+                    "${p}unSnapshotVersion" as String,
+                    "${p}confirmReleaseVersion" as String,
+                    "${p}checkSnapshotDependencies" as String,
+                    "${p}runBuildTasks" as String,
+                    "${p}preTagCommit" as String,
+                    "${p}createReleaseTag" as String,
+                    "${p}checkoutMergeFromReleaseBranch" as String,
+                    "${p}updateVersion" as String,
+                    "${p}commitNewVersion" as String
             ]
         }
 
         project.task('createScmAdapter', group: RELEASE_GROUP,
-            description: 'Finds the correct SCM plugin') doLast this.&createScmAdapter
+                description: 'Finds the correct SCM plugin') doLast this.&createScmAdapter
         project.task('initScmAdapter', group: RELEASE_GROUP,
-            description: 'Initializes the SCM plugin') doLast this.&initScmAdapter
+                description: 'Initializes the SCM plugin') doLast this.&initScmAdapter
         project.task('checkCommitNeeded', group: RELEASE_GROUP,
-            description: 'Checks to see if there are any added, modified, removed, or un-versioned files.') doLast this.&checkCommitNeeded
+                description: 'Checks to see if there are any added, modified, removed, or un-versioned files.') doLast this.&checkCommitNeeded
         project.task('checkUpdateNeeded', group: RELEASE_GROUP,
-            description: 'Checks to see if there are any incoming or outgoing changes that haven\'t been applied locally.') doLast this.&checkUpdateNeeded
+                description: 'Checks to see if there are any incoming or outgoing changes that haven\'t been applied locally.') doLast this.&checkUpdateNeeded
         project.task('checkoutMergeToReleaseBranch', group: RELEASE_GROUP,
-            description: 'Checkout to the release branch, and merge modifications from the main branch in working tree.') {
+                description: 'Checkout to the release branch, and merge modifications from the main branch in working tree.') {
             doLast this.&checkoutAndMergeToReleaseBranch
             onlyIf {
                 extension.pushReleaseVersionBranch
             }
         }
         project.task('unSnapshotVersion', group: RELEASE_GROUP,
-            description: 'Removes "-SNAPSHOT" from your project\'s current version.') doLast this.&unSnapshotVersion
+                description: 'Removes "-SNAPSHOT" from your project\'s current version.') doLast this.&unSnapshotVersion
         project.task('confirmReleaseVersion', group: RELEASE_GROUP,
-            description: 'Prompts user for this release version. Allows for alpha or pre releases.') doLast this.&confirmReleaseVersion
+                description: 'Prompts user for this release version. Allows for alpha or pre releases.') doLast this.&confirmReleaseVersion
         project.task('checkSnapshotDependencies', group: RELEASE_GROUP,
-            description: 'Checks to see if your project has any SNAPSHOT dependencies.') doLast this.&checkSnapshotDependencies
+                description: 'Checks to see if your project has any SNAPSHOT dependencies.') doLast this.&checkSnapshotDependencies
 
         project.task('runBuildTasks', group: RELEASE_GROUP,
-            description: 'Runs the build process in a separate gradle run.', type: GradleBuild) {
+                description: 'Runs the build process in a separate gradle run.', type: GradleBuild) {
             startParameter = project.getGradle().startParameter.newInstance()
 
             project.afterEvaluate {
                 tasks = [
-                    "${p}beforeReleaseBuild" as String,
-                    extension.buildTasks.collect { p + it },
-                    "${p}afterReleaseBuild" as String
+                        "${p}beforeReleaseBuild" as String,
+                        extension.buildTasks.collect { p + it },
+                        "${p}afterReleaseBuild" as String
                 ].flatten()
             }
         }
         project.task('preTagCommit', group: RELEASE_GROUP,
-            description: 'Commits any changes made by the Release plugin - eg. If the unSnapshotVersion task was executed') doLast this.&preTagCommit
+                description: 'Commits any changes made by the Release plugin - eg. If the unSnapshotVersion task was executed') doLast this.&preTagCommit
         project.task('createReleaseTag', group: RELEASE_GROUP,
-            description: 'Creates a tag in SCM for the current (un-snapshotted) version.') doLast this.&commitTag
+                description: 'Creates a tag in SCM for the current (un-snapshotted) version.') doLast this.&commitTag
         project.task('checkoutMergeFromReleaseBranch', group: RELEASE_GROUP,
-            description: 'Checkout to the main branch, and merge modifications from the release branch in working tree.') {
+                description: 'Checkout to the main branch, and merge modifications from the release branch in working tree.') {
             doLast this.&checkoutAndMergeFromReleaseBranch
             onlyIf {
                 extension.pushReleaseVersionBranch
             }
         }
         project.task('updateVersion', group: RELEASE_GROUP,
-            description: 'Prompts user for the next version. Does it\'s best to supply a smart default.') doLast this.&updateVersion
+                description: 'Prompts user for the next version. Does it\'s best to supply a smart default.') doLast this.&updateVersion
         project.task('commitNewVersion', group: RELEASE_GROUP,
-            description: 'Commits the version update to your SCM') doLast this.&commitNewVersion
+                description: 'Commits the version update to your SCM') doLast this.&commitNewVersion
 
         Boolean supportsMustRunAfter = project.tasks.initScmAdapter.respondsTo('mustRunAfter')
 
@@ -129,9 +129,9 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
         }
 
         project.task('beforeReleaseBuild', group: RELEASE_GROUP,
-            description: 'Runs immediately before the build when doing a release') {}
+                description: 'Runs immediately before the build when doing a release') {}
         project.task('afterReleaseBuild', group: RELEASE_GROUP,
-            description: 'Runs immediately after the build when doing a release') {}
+                description: 'Runs immediately after the build when doing a release') {}
 
         if (supportsMustRunAfter) {
             project.afterEvaluate {
@@ -147,7 +147,8 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             if (state.failure && task.name == "release") {
                 try {
                     createScmAdapter()
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
                 if (scmAdapter && extension.revertOnFail && project.file(extension.versionPropertyFile)?.exists()) {
                     log.error('Release process failed, reverting back any changes made by Release Plugin.')
                     scmAdapter.revert()
@@ -318,8 +319,8 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
 
         assert properties.version, "[$propertiesFile.canonicalPath] contains no 'version' property"
         assert extension.versionPatterns.keySet().any { (properties.version =~ it).find() },
-            "[$propertiesFile.canonicalPath] version [$properties.version] doesn't match any of known version patterns: " +
-                extension.versionPatterns.keySet()
+                "[$propertiesFile.canonicalPath] version [$properties.version] doesn't match any of known version patterns: " +
+                        extension.versionPatterns.keySet()
 
         // set the project version from the properties file if it was not otherwise specified
         if (!isVersionDefined()) {
@@ -349,7 +350,7 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
 
         if (adapter == null) {
             throw new GradleException(
-                "No supported Adapter could be found. Are [${ projectPath }] or its parents are valid scm directories?")
+                    "No supported Adapter could be found. Are [${projectPath}] or its parents are valid scm directories?")
         }
 
         adapter

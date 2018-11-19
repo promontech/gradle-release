@@ -53,8 +53,8 @@ class PluginHelper {
      * @return command "stdout" output
      */
     String exec(
-        Map options = [:],
-        List<String> commands
+            Map options = [:],
+            List<String> commands
     ) {
         initExecutor()
         options['directory'] = options['directory'] ?: project.rootDir
@@ -122,8 +122,8 @@ class PluginHelper {
         if (extension.tagTemplate) {
             def engine = new SimpleTemplateEngine()
             def binding = [
-                "version": project.version,
-                "name"   : project.name
+                    "version": project.version,
+                    "name"   : project.name
             ]
             tagName = engine.createTemplate(extension.tagTemplate).make(binding).toString()
         } else {

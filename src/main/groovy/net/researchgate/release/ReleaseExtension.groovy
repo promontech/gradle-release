@@ -50,19 +50,19 @@ class ReleaseExtension {
     List versionProperties = []
 
     List buildTasks = ['build']
-	
+
     List ignoredSnapshotDependencies = []
 
     Map<String, Closure<String>> versionPatterns = [
-        // Increments last number: "2.5-SNAPSHOT" => "2.6-SNAPSHOT"
-        /(\d+)([^\d]*$)/: { Matcher m, Project p -> m.replaceAll("${(m[0][1] as int) + 1}${m[0][2]}") }
+            // Increments last number: "2.5-SNAPSHOT" => "2.6-SNAPSHOT"
+            /(\d+)([^\d]*$)/: { Matcher m, Project p -> m.replaceAll("${(m[0][1] as int) + 1}${m[0][2]}") }
     ]
 
     List<Class<? extends BaseScmAdapter>> scmAdapters = [
-        GitAdapter,
-        SvnAdapter,
-        HgAdapter,
-        BzrAdapter
+            GitAdapter,
+            SvnAdapter,
+            HgAdapter,
+            BzrAdapter
     ];
 
     private Project project
