@@ -55,7 +55,6 @@ class GitAdapter extends BaseScmAdapter {
 
         workingBranch = gitCurrentBranch()
         releaseBranch = extension.pushReleaseVersionBranch ? "release/${getReleaseVersion().replace('-SNAPSHOT', '')}" : workingBranch
-        println("RELEASE BRNACH IS $releaseBranch")
     }
 
     @Override
@@ -167,7 +166,6 @@ class GitAdapter extends BaseScmAdapter {
     }
 
     private checkoutMerge(String fromBranch, String toBranch) {
-        println("Checkout Release branch $fromBranch $toBranch")
         exec(['git', 'fetch'], directory: workingDirectory, errorPatterns: ['error: ', 'fatal: '])
         exec(['git', 'branch', toBranch], directory: workingDirectory, failOnStderr: false)
         exec(['git', 'checkout', toBranch], directory: workingDirectory, errorPatterns: ['error: ', 'fatal: '])

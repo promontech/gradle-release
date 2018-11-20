@@ -266,6 +266,7 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             version -= '-SNAPSHOT'
             updateVersionProperty(version)
         }
+        scmAdapter.commit(extension.releaseVersionCommitMessage + " '${tagName()}'.")
     }
 
     void preTagCommit() {

@@ -38,6 +38,8 @@ class ReleaseExtension {
 
     String newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
 
+    String releaseVersionCommitMessage = '[Gradle Release Plugin] - release version commit: '
+
     def pushReleaseVersionBranch = false
 
     /**
