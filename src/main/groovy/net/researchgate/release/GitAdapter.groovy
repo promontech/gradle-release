@@ -54,7 +54,7 @@ class GitAdapter extends BaseScmAdapter {
         super(project, attributes)
 
         workingBranch = gitCurrentBranch()
-        releaseBranch = extension.pushReleaseVersionBranch ? "release/${getReleaseVersion()}" : workingBranch
+        releaseBranch = extension.pushReleaseVersionBranch ? "release/${getReleaseVersion().replace('-SNAPSHOT', '')}" : workingBranch
         println("RELEASE BRNACH IS $releaseBranch")
     }
 
