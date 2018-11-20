@@ -23,6 +23,7 @@ import java.util.regex.Matcher
 class ReleasePlugin extends PluginHelper implements Plugin<Project> {
 
     static final String RELEASE_GROUP = 'Release'
+    static final String PROMOTE_GROUP = 'Promote'
 
     private BaseScmAdapter scmAdapter
 
@@ -39,7 +40,7 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
         String p = project.path
         p = !p.endsWith(Project.PATH_SEPARATOR) ? p + Project.PATH_SEPARATOR : p
 
-        project.task('release', description: 'Verify project, release, and update version to next.', group: RELEASE_GROUP, type: GradleBuild) {
+        project.task('release', description: 'Verify project, cut release branch, and update version to next.', group: RELEASE_GROUP, type: GradleBuild) {
             startParameter = project.getGradle().startParameter.newInstance()
 
             tasks = [
@@ -48,6 +49,27 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
                     "${p}checkCommitNeeded" as String,
                     "${p}checkUpdateNeeded" as String,
                     "${p}checkoutMergeToReleaseBranch" as String,
+                    "${p}unSnapshotVersion" as String,
+                    "${p}confirmReleaseVersion" as String,
+                    "${p}checkSnapshotDependencies" as String,
+                    "${p}runBuildTasks" as String,
+//                    "${p}preTagCommit" as String,
+//                    "${p}createReleaseTag" as String,
+                    "${p}checkoutMergeFromReleaseBranch" as String,
+                    "${p}updateVersion" as String,
+                    "${p}commitNewVersion" as String
+            ]
+        }
+
+        project.task('promote', description: 'Tag end of release, promote to release repo', group: RELEASE_GROUP, type: GradleBuild) {
+            startParameter = project.getGradle().startParameter.newInstance()
+
+            tasks = [
+                    "${p}createScmAdapter" as String,
+                    "${p}initScmAdapter" as String,
+                    "${p}checkCommitNeeded" as String,
+                    "${p}checkUpdateNeeded" as String,
+//                    "${p}checkoutMergeToReleaseBranch" as String, //TODO checkout no merge
                     "${p}unSnapshotVersion" as String,
                     "${p}confirmReleaseVersion" as String,
                     "${p}checkSnapshotDependencies" as String,
