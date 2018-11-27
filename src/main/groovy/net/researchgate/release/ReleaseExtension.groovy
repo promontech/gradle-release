@@ -60,6 +60,10 @@ class ReleaseExtension {
             /(\d+)([^\d]*$)/: { Matcher m, Project p -> m.replaceAll("${(m[0][1] as int) + 1}${m[0][2]}") }
     ]
 
+    List<String> releaseBranchPatterns = [
+            /^(release|hotfix).*/
+    ]
+
     List<Class<? extends BaseScmAdapter>> scmAdapters = [
             GitAdapter,
             SvnAdapter,

@@ -70,7 +70,7 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
                     "${p}checkCommitNeeded" as String,
                     "${p}checkUpdateNeeded" as String,
 //                    "${p}checkoutMergeToReleaseBranch" as String, //TODO checkout no merge
-                    "${p}unSnapshotVersion" as String,
+                    "${p}verifyReleaseOrHotfixBranch" as String,
                     "${p}confirmReleaseVersion" as String,
                     "${p}checkSnapshotDependencies" as String,
                     "${p}runBuildTasks" as String,
@@ -99,6 +99,8 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
         }
         project.task('unSnapshotVersion', group: RELEASE_GROUP,
                 description: 'Removes "-SNAPSHOT" from your project\'s current version.') doLast this.&unSnapshotVersion
+        project.task('verifyReleaseOrHotfixBranch', group: RELEASE_GROUP,
+                description: 'Verify repo is on release or hotfix branch to promote') doLast this.&verifyReleaseOrHotfixBranch
         project.task('confirmReleaseVersion', group: RELEASE_GROUP,
                 description: 'Prompts user for this release version. Allows for alpha or pre releases.') doLast this.&confirmReleaseVersion
         project.task('checkSnapshotDependencies', group: RELEASE_GROUP,
@@ -267,6 +269,14 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             updateVersionProperty(version)
         }
         scmAdapter.commit(extension.releaseVersionCommitMessage + " '${tagName()}'.")
+    }
+
+    void verifyReleaseOrHotfixBranch() {
+        def currentBranch = scmAdapter.getBranch().replaceAll("\\s","")
+        if (extension.releaseBranchPatterns.any { currentBranch.matches(it) }) {
+            return
+        }
+        throw new GradleException("Repository must match a releaseBranchPattern.\nCurrent branch is '$currentBranch'\nCurrent patterns are [${extension.releaseBranchPatterns.join(", ")}]")
     }
 
     void preTagCommit() {

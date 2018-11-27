@@ -37,6 +37,10 @@ abstract class BaseScmAdapter extends PluginHelper {
 
     abstract void commit(String message)
 
+    String getBranch() {
+        throw new GradleException("Getting current branch is currently only supported for GIT projects")
+    }
+
     abstract void revert()
 
     void checkoutMergeToReleaseBranch() {

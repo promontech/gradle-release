@@ -25,7 +25,7 @@ class GitAdapter extends BaseScmAdapter {
     private static final String BEHIND = 'behind'
 
     private final String workingBranch
-    private final String releaseBranch
+    private final Boolean pushReleaseVersionBranch
 
     private File workingDirectory
 
@@ -54,7 +54,7 @@ class GitAdapter extends BaseScmAdapter {
         super(project, attributes)
 
         workingBranch = gitCurrentBranch()
-        releaseBranch = extension.pushReleaseVersionBranch ? "release/${getReleaseVersion().replace('-SNAPSHOT', '')}" : workingBranch
+        pushReleaseVersionBranch = extension.pushReleaseVersionBranch
     }
 
     @Override
@@ -145,6 +145,11 @@ class GitAdapter extends BaseScmAdapter {
     }
 
     @Override
+    String getBranch() {
+        return exec(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
+    }
+
+    @Override
     void add(File file) {
         exec(['git', 'add', file.path], directory: workingDirectory, errorMessage: "Error adding file ${file.name}", errorPatterns: ['error: ', 'fatal: '])
     }
@@ -157,12 +162,16 @@ class GitAdapter extends BaseScmAdapter {
 
     @Override
     void checkoutMergeToReleaseBranch() {
-        checkoutMerge(workingBranch, releaseBranch)
+        checkoutMerge(workingBranch, getReleaseBranch())
     }
 
     @Override
     void checkoutMergeFromReleaseBranch() {
-        checkoutMerge(releaseBranch, workingBranch)
+        checkoutMerge(getReleaseBranch(), workingBranch)
+    }
+
+    String getReleaseBranch() {
+        return pushReleaseVersionBranch ? "release/${getReleaseVersion().replace('-SNAPSHOT', '')}" : workingBranch
     }
 
     private checkoutMerge(String fromBranch, String toBranch) {
