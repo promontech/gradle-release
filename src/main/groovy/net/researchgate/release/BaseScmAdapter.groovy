@@ -50,4 +50,8 @@ abstract class BaseScmAdapter extends PluginHelper {
     void checkoutMergeFromReleaseBranch() {
         throw new GradleException("Checkout and merge is supported only for GIT projects")
     }
+
+    void checkoutReleaseBranch() {
+        throw new GradleException("Checkout and merge is supported only for GIT projects")
+    }
 }

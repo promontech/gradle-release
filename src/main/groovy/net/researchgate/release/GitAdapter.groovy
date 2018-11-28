@@ -146,7 +146,7 @@ class GitAdapter extends BaseScmAdapter {
 
     @Override
     String getBranch() {
-        return exec(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
+        return exec(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).replaceAll("\\s","")
     }
 
     @Override
@@ -162,22 +162,32 @@ class GitAdapter extends BaseScmAdapter {
 
     @Override
     void checkoutMergeToReleaseBranch() {
-        checkoutMerge(workingBranch, getReleaseBranch())
+        checkout(getReleaseBranch())
+        merge(workingBranch)
     }
 
     @Override
     void checkoutMergeFromReleaseBranch() {
-        checkoutMerge(getReleaseBranch(), workingBranch)
+        checkout(workingBranch)
+        merge(getReleaseBranch())
+    }
+
+    @Override
+    void checkoutReleaseBranch() {
+        checkout(getReleaseBranch())
     }
 
     String getReleaseBranch() {
         return pushReleaseVersionBranch ? "release/${getReleaseVersion().replace('-SNAPSHOT', '')}" : workingBranch
     }
 
-    private checkoutMerge(String fromBranch, String toBranch) {
+    private checkout(String branch) {
         exec(['git', 'fetch'], directory: workingDirectory, errorPatterns: ['error: ', 'fatal: '])
-        exec(['git', 'branch', toBranch], directory: workingDirectory, failOnStderr: false)
-        exec(['git', 'checkout', toBranch], directory: workingDirectory, errorPatterns: ['error: ', 'fatal: '])
+        exec(['git', 'branch', branch], directory: workingDirectory, failOnStderr: false)
+        exec(['git', 'checkout', branch], directory: workingDirectory, errorPatterns: ['error: ', 'fatal: '])
+    }
+
+    private merge(String fromBranch) {
         exec(['git', 'merge', '--no-ff', '--no-commit', fromBranch], directory: workingDirectory, errorPatterns: ['error: ', 'fatal: ', 'CONFLICT'])
     }
 

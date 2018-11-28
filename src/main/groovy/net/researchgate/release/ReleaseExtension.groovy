@@ -30,6 +30,9 @@ class ReleaseExtension {
 
     boolean revertOnFail = true
 
+//    @Option(option = 'useAutomaticVersion', description = 'Set the filename of the file to be opened.')
+    boolean useAutomaticVersion
+
     String preCommitText = ''
 
     String preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '

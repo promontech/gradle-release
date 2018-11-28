@@ -60,6 +60,10 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
                     "${p}commitNewVersion" as String
             ]
         }
+        project.task('blah', description: 'Verify project, cut release branch, and update version to next.', group: RELEASE_GROUP, type: GradleBuild) doLast {
+            println("TESTING")
+            println("extension ${extension.useAutomaticVersion}")
+        }
 
         project.task('promote', description: 'Tag end of release, promote to release repo', group: RELEASE_GROUP, type: GradleBuild) {
             startParameter = project.getGradle().startParameter.newInstance()
@@ -69,8 +73,8 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
                     "${p}initScmAdapter" as String,
                     "${p}checkCommitNeeded" as String,
                     "${p}checkUpdateNeeded" as String,
-//                    "${p}checkoutMergeToReleaseBranch" as String, //TODO checkout no merge
-                    "${p}verifyReleaseOrHotfixBranch" as String,
+                    "${p}unSnapshotVersion" as String,
+                    "${p}isReleaseOrHotfixBranch" as String,
                     "${p}confirmReleaseVersion" as String,
                     "${p}checkSnapshotDependencies" as String,
                     "${p}runBuildTasks" as String,
@@ -99,8 +103,8 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
         }
         project.task('unSnapshotVersion', group: RELEASE_GROUP,
                 description: 'Removes "-SNAPSHOT" from your project\'s current version.') doLast this.&unSnapshotVersion
-        project.task('verifyReleaseOrHotfixBranch', group: RELEASE_GROUP,
-                description: 'Verify repo is on release or hotfix branch to promote') doLast this.&verifyReleaseOrHotfixBranch
+        project.task('isReleaseOrHotfixBranch', group: RELEASE_GROUP,
+                description: 'Verify repo is on release or hotfix branch to promote') doLast this.&isReleaseOrHotfixBranch
         project.task('confirmReleaseVersion', group: RELEASE_GROUP,
                 description: 'Prompts user for this release version. Allows for alpha or pre releases.') doLast this.&confirmReleaseVersion
         project.task('checkSnapshotDependencies', group: RELEASE_GROUP,
@@ -271,12 +275,21 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
         scmAdapter.commit(extension.releaseVersionCommitMessage + " '${tagName()}'.")
     }
 
-    void verifyReleaseOrHotfixBranch() {
-        def currentBranch = scmAdapter.getBranch().replaceAll("\\s","")
+
+    void checkoutReleaseOrHotfixBranch() {
+        def currentBranch = scmAdapter.getBranch()
         if (extension.releaseBranchPatterns.any { currentBranch.matches(it) }) {
             return
         }
-        throw new GradleException("Repository must match a releaseBranchPattern.\nCurrent branch is '$currentBranch'\nCurrent patterns are [${extension.releaseBranchPatterns.join(", ")}]")
+        return
+    }
+
+    boolean isReleaseOrHotfixBranch() {
+        def currentBranch = scmAdapter.getBranch()
+        if (extension.releaseBranchPatterns.any { currentBranch.matches(it) }) {
+            return true
+        }
+        return false
     }
 
     void preTagCommit() {
@@ -329,6 +342,22 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
         }
 
         return readLine("Enter the next version (current one released as [${project.version}]):", nextVersion ?: candidateVersion)
+    }
+
+    String getReleaseVersion() {
+        String releaseVersion = findProperty('release.version')
+
+        if (extension.useAutomaticVersion) {
+            if (isReleaseOrHotfixBranch()) {
+                return scmAdapter.getBranch()
+            } else if (releaseVersion) {
+                return releaseVersion
+            } else {
+                throw new GradleException("Repository must match a releaseBranchPattern.\nCurrent branch is '$currentBranch'\nCurrent patterns are [${extension.releaseBranchPatterns.join(", ")}]")
+            }
+        }
+
+        return readLine("Enter the release version (current one released as [${project.version}]):", releaseVersion ?: candidateVersion)
     }
 
     def commitNewVersion() {
