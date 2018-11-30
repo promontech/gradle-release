@@ -86,6 +86,10 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             ]
         }
 
+//        project.task('createScmAdapter', type: CreateScmAdapter.class) {
+//            group = RELEASE_GROUP
+//            description = 'Finds the correct SCM plugin'
+//        }
         project.task('createScmAdapter', group: RELEASE_GROUP,
                 description: 'Finds the correct SCM plugin') doLast this.&createScmAdapter
         project.task('initScmAdapter', group: RELEASE_GROUP,
