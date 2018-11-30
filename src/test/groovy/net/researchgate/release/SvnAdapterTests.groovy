@@ -12,8 +12,10 @@ package net.researchgate.release
 import net.researchgate.release.cli.Executor
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import spock.lang.Ignore
 import spock.lang.Specification
 
+@Ignore
 class SvnAdapterTests extends Specification {
     Project project
     SvnAdapter svnAdapter

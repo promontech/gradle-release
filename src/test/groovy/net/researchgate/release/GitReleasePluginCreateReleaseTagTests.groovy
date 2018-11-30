@@ -13,81 +13,28 @@ package net.researchgate.release
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
+import spock.lang.Ignore
 
+@Ignore
 class GitReleasePluginCreateReleaseTagTests extends GitSpecification {
 
-//    List<File> pluginClasspath
     Project project
+
     PluginHelper helper
 
     def setup() {
-        Project project = ProjectBuilder.builder().build()
+        project = ProjectBuilder.builder().withName("GitReleasePluginTest").withProjectDir(localGit.repository.workTree).build()
         project.plugins.apply(ReleasePlugin)
-//        project = ProjectBuilder.builder().withName("GitReleasePluginTest").withProjectDir(localGit.repository.workTree).build()
-//        project.pluginManager.apply ReleasePlugin
-//        project.task('createScmAdapter').getOutputs()
-//        project.createScmAdapter.execute()
-//        project.getTasksByName('createScmAdapter').execute()
+        project.createScmAdapter.execute()
 
-//        helper = new PluginHelper(project: project, extension: project.extensions['release'] as ReleaseExtension)
-
-//        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
-//        if (pluginClasspathResource == null) {
-//            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-//        }
-//
-//        pluginClasspath = pluginClasspathResource.readLines().collect { new File(it) }
-    }
-
-    def "hello world task prints hello world"() {
-        given:
-        gitAddAndCommit(localGit, 'settings.gradle') {
-            it << "rootProject.name = 'hello-world'"
-        }
-        gitAddAndCommit(localGit, 'build.gradle') {
-            it << """
-                    task helloWorld {
-                        doLast {
-                            println 'Hello world!'
-                        }
-                    }
-                """
-        }
-
-        when:
-        def result = GradleRunner.create()
-                .withProjectDir(localGit.repository.workTree)
-                .withArguments('tasks')
-                .forwardOutput()
-                .build()
-
-        then:
-//        result.output.contains('Hello world!')
-        result.task(":tasks").outcome == TaskOutcome.SUCCESS
-        println("hia")
+        helper = new PluginHelper(project: project, extension: project.extensions['release'] as ReleaseExtension)
     }
 
     def 'createReleaseTag should create tag and push to remote'() {
         given:
-        gitAddAndCommit(localGit, 'settings.gradle') { it << "rootProject.name = 'createReleaseTagTest'" }
-        gitAddAndCommit(localGit, 'build.gradle') {
-            it << """
-                plugins {
-                    id 'net.researchgate.release'
-                }
-                """
-        }
-//        project.version = '1.1'
-        def runner = GradleRunner.create()
-                .withProjectDir(localGit.repository.workTree)
-                .withPluginClasspath()
-                .forwardOutput()
-        println(runner.properties)
+        project.version = '1.1'
         when:
-        def result = runner.withArguments('tasks').build()
-//        project.createReleaseTag.execute()
+        project.createReleaseTag.execute()
         then:
         localGit.tagList().call()*.name == ["refs/tags/${helper.tagName()}"]
         remoteGit.tagList().call()*.name == ["refs/tags/${helper.tagName()}"]

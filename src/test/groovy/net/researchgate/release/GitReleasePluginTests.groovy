@@ -14,8 +14,10 @@ import net.researchgate.release.cli.Executor
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import spock.lang.Ignore
 import spock.lang.Specification
 
+@Ignore
 class GitReleasePluginTests extends Specification {
 
     Project project

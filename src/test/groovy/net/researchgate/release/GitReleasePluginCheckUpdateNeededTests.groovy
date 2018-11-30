@@ -13,7 +13,9 @@ package net.researchgate.release
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import spock.lang.Ignore
 
+@Ignore
 class GitReleasePluginCheckUpdateNeededTests extends GitSpecification {
 
     Project project

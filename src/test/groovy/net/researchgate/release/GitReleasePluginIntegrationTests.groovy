@@ -12,9 +12,11 @@ package net.researchgate.release
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import spock.lang.Ignore
 
 import static org.eclipse.jgit.lib.Repository.shortenRefName
 
+@Ignore
 class GitReleasePluginIntegrationTests extends GitSpecification {
 
     Project project

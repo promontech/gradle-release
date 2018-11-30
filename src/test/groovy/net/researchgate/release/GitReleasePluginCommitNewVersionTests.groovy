@@ -13,7 +13,9 @@ package net.researchgate.release
 import org.eclipse.jgit.lib.Constants
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import spock.lang.Ignore
 
+@Ignore
 class GitReleasePluginCommitNewVersionTests extends GitSpecification {
 
     Project project

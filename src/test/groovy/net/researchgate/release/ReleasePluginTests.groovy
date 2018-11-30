@@ -12,8 +12,10 @@ package net.researchgate.release
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import spock.lang.Ignore
 import spock.lang.Specification
 
+@Ignore
 class ReleasePluginTests extends Specification {
 
     Project project
