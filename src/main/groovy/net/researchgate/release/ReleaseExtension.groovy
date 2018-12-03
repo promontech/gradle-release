@@ -19,54 +19,35 @@ import java.util.regex.Pattern
 class ReleaseExtension {
 
     boolean failOnCommitNeeded = true
-
     boolean failOnPublishNeeded = true
-
     boolean failOnSnapshotDependencies = true
-
     boolean failOnUnversionedFiles = true
-
     boolean failOnUpdateNeeded = true
-
     boolean revertOnFail = true
-
 //    @Option(option = 'useAutomaticVersion', description = 'Set the filename of the file to be opened.')
     boolean useAutomaticVersion
-
     String preCommitText = ''
-
     String preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
-
     String tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
-
     String newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
-
     String releaseVersionCommitMessage = '[Gradle Release Plugin] - release version commit: '
-
     def pushReleaseVersionBranch = false
 
     /**
      * as of 3.0 set this to "$version" by default
      */
     String tagTemplate
-
     String versionPropertyFile = 'gradle.properties'
-
     List versionProperties = []
-
     List buildTasks = ['build']
-
     List ignoredSnapshotDependencies = []
-
     Map<String, Closure<String>> versionPatterns = [
             // Increments last number: "2.5-SNAPSHOT" => "2.6-SNAPSHOT"
             /(\d+)([^\d]*$)/: { Matcher m, Project p -> m.replaceAll("${(m[0][1] as int) + 1}${m[0][2]}") }
     ]
-
     List<String> releaseBranchPatterns = [
             /^(release|hotfix).*/
     ]
-
     List<Class<? extends BaseScmAdapter>> scmAdapters = [
             GitAdapter,
             SvnAdapter,
@@ -74,6 +55,7 @@ class ReleaseExtension {
             BzrAdapter
     ]
 
+    GitAdapter.GitConfig git = new GitAdapter.GitConfig()
     private Project project
     private Map<String, Object> attributes
 

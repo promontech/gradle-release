@@ -6,16 +6,19 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-open class CreateScmAdapter : DefaultTask() {
+/**
+ * Create the SCM adapter based on the type of SCM in use in the project
+ */
+open class CreateScmAdapterTask : DefaultTask() {
     var scmAdapter: BaseScmAdapter? = null
     var extension: ReleaseExtension = project.extensions.getByType(ReleaseExtension::class.java)
 
     @TaskAction
     fun createScmAdapter() {
-        description = "Finds the correct SCM plugin"
+        println("Creating SCM Adapter")
+
         val projectPath: File = project.projectDir.canonicalFile
 
-        println("print message here")
         val instance: Class<out BaseScmAdapter>? = extension.scmAdapters.find {
             assert(BaseScmAdapter::class.java.isAssignableFrom(it))
 

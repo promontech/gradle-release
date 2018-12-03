@@ -86,33 +86,18 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             ]
         }
 
-        project.task('createScmAdapter', type: CreateScmAdapter.class) {
+        CreateScmAdapterTask createScmAdapterTask = project.task('createScmAdapter', type: CreateScmAdapterTask.class) {
             group = RELEASE_GROUP
             description = 'Finds the correct SCM plugin'
         }
-
-//        project.tasks.withType(CreateScmAdapterGroovy)
-//        project.task('createScmAdapter', group: RELEASE_GROUP,
-//                description: 'Finds the correct SCM plugin') doLast this.&createScmAdapter
-//        project.tasks.create(PREPARE_TASK_NAME) {
-//            description = 'Verifies that the project could be released.'
-//            doLast {
-//                ext.grgit = extension.grgit
-//                prepare(extension)
-//            }
-//        }
-
-        project.task('initScmAdapter', type: InitScmAdapter.class) {
+        project.task('initScmAdapter', type: InitScmAdapterTask.class) {
             group = RELEASE_GROUP
             description = 'Initializes the SCM plugin'
-            doLast {
-                scmAdapter = project.tasks.getByName("createScmAdapter").properties.get("scmAdapter")
-            }
         }
-//        project.task('initScmAdapter', group: RELEASE_GROUP,
-//                description: 'Initializes the SCM plugin') doLast this.&initScmAdapter
-        project.task('checkCommitNeeded', group: RELEASE_GROUP,
-                description: 'Checks to see if there are any added, modified, removed, or un-versioned files.') doLast this.&checkCommitNeeded
+        project.task('checkCommitNeeded', type: CheckCommitNeededTask.class, dependsOn: createScmAdapterTask) {
+            group = RELEASE_GROUP
+            description = 'Checks to see if there are any added, modified, removed, or un-versioned files.'
+        }
         project.task('checkUpdateNeeded', group: RELEASE_GROUP,
                 description: 'Checks to see if there are any incoming or outgoing changes that haven\'t been applied locally.') doLast this.&checkUpdateNeeded
         project.task('checkoutMergeToReleaseBranch', group: RELEASE_GROUP,
@@ -210,14 +195,6 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
 
     void createScmAdapter() {
         scmAdapter = findScmAdapter()
-    }
-
-    void initScmAdapter() {
-        scmAdapter.init()
-    }
-
-    void checkCommitNeeded() {
-        scmAdapter.checkCommitNeeded()
     }
 
     void checkUpdateNeeded() {
