@@ -90,10 +90,27 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             group = RELEASE_GROUP
             description = 'Finds the correct SCM plugin'
         }
+
+//        project.tasks.withType(CreateScmAdapterGroovy)
 //        project.task('createScmAdapter', group: RELEASE_GROUP,
 //                description: 'Finds the correct SCM plugin') doLast this.&createScmAdapter
-        project.task('initScmAdapter', group: RELEASE_GROUP,
-                description: 'Initializes the SCM plugin') doLast this.&initScmAdapter
+//        project.tasks.create(PREPARE_TASK_NAME) {
+//            description = 'Verifies that the project could be released.'
+//            doLast {
+//                ext.grgit = extension.grgit
+//                prepare(extension)
+//            }
+//        }
+
+        project.task('initScmAdapter', type: InitScmAdapter.class) {
+            group = RELEASE_GROUP
+            description = 'Initializes the SCM plugin'
+            doLast {
+                scmAdapter = project.tasks.getByName("createScmAdapter").properties.get("scmAdapter")
+            }
+        }
+//        project.task('initScmAdapter', group: RELEASE_GROUP,
+//                description: 'Initializes the SCM plugin') doLast this.&initScmAdapter
         project.task('checkCommitNeeded', group: RELEASE_GROUP,
                 description: 'Checks to see if there are any added, modified, removed, or un-versioned files.') doLast this.&checkCommitNeeded
         project.task('checkUpdateNeeded', group: RELEASE_GROUP,
@@ -145,7 +162,7 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
         Boolean supportsMustRunAfter = project.tasks.initScmAdapter.respondsTo('mustRunAfter')
 
         if (supportsMustRunAfter) {
-            project.tasks.initScmAdapter.mustRunAfter(project.tasks.createScmAdapter)
+            project.tasks.initScmAdapter.dependsOn(project.tasks.createScmAdapter)
             project.tasks.checkCommitNeeded.mustRunAfter(project.tasks.initScmAdapter)
             project.tasks.checkUpdateNeeded.mustRunAfter(project.tasks.checkCommitNeeded)
             project.tasks.checkoutMergeToReleaseBranch.mustRunAfter(project.tasks.checkUpdateNeeded)

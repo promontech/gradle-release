@@ -111,10 +111,6 @@ sourceSets {
     main.kotlin.srcDirs += 'src/main/groovy'
     main.java.srcDirs += 'src/main/groovy'
 }
-//compileJava   {
-//    sourceCompatibility = '1.8'
-//    targetCompatibility = '1.8'
-//}
 
 compileGroovy.dependsOn.remove('compileJava')
 compileKotlin.dependsOn compileGroovy

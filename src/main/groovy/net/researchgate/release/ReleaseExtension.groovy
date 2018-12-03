@@ -72,7 +72,7 @@ class ReleaseExtension {
             SvnAdapter,
             HgAdapter,
             BzrAdapter
-    ];
+    ]
 
     private Project project
     private Map<String, Object> attributes

@@ -7,14 +7,8 @@ import org.gradle.api.tasks.TaskAction
 import java.io.File
 
 open class CreateScmAdapter : DefaultTask() {
-//    private val configurableOutputFiles: ConfigurableFileCollection = project.layout.configurableFiles()
-
     var scmAdapter: BaseScmAdapter? = null
-//    var message by project.objects.property<String>()
-//    var outputFiles: FileCollection by configurableOutputFiles
-
     var extension: ReleaseExtension = project.extensions.getByType(ReleaseExtension::class.java)
-//    var extension2: PluginHelper = project.parent as PluginHelper
 
     @TaskAction
     fun createScmAdapter() {
@@ -25,12 +19,13 @@ open class CreateScmAdapter : DefaultTask() {
         val instance: Class<out BaseScmAdapter>? = extension.scmAdapters.find {
             assert(BaseScmAdapter::class.java.isAssignableFrom(it))
 
-            val instance: BaseScmAdapter = it.getConstructor(Project::class.java, Map::class.java).newInstance(project,null) /*extension2.attributes)*/
+            val instance: BaseScmAdapter = it.getConstructor(Project::class.java, Map::class.java).newInstance(project,null) //, this.attributes)
             instance.isSupported(projectPath)
         }
 
         scmAdapter = instance?.getConstructor(Project::class.java, Map::class.java)?.newInstance(project, null)/*extension2.attributes)*/
                 ?: throw GradleException("No supported Adapter could be found. Are [${projectPath}] or its parents are valid scm directories?")
+        scmAdapter!!.init()
     }
 
 
