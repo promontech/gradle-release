@@ -98,8 +98,10 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             group = RELEASE_GROUP
             description = 'Checks to see if there are any added, modified, removed, or un-versioned files.'
         }
-        project.task('checkUpdateNeeded', group: RELEASE_GROUP,
-                description: 'Checks to see if there are any incoming or outgoing changes that haven\'t been applied locally.') doLast this.&checkUpdateNeeded
+        project.task('checkUpdateNeeded', type: CheckUpdateNeededTask.class, dependsOn: createScmAdapterTask) {
+            group = RELEASE_GROUP
+            description = 'Checks to see if there are any incoming or outgoing changes that haven\'t been applied locally.'
+        }
         project.task('checkoutMergeToReleaseBranch', group: RELEASE_GROUP,
                 description: 'Checkout to the release branch, and merge modifications from the main branch in working tree.') {
             doLast this.&checkoutAndMergeToReleaseBranch
@@ -195,10 +197,6 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
 
     void createScmAdapter() {
         scmAdapter = findScmAdapter()
-    }
-
-    void checkUpdateNeeded() {
-        scmAdapter.checkUpdateNeeded()
     }
 
     void checkoutAndMergeToReleaseBranch() {
