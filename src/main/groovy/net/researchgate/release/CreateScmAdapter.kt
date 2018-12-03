@@ -19,8 +19,6 @@ open class CreateScmAdapter : DefaultTask() {
     @TaskAction
     fun createScmAdapter() {
         description = "Finds the correct SCM plugin"
-
-//        println("extension 2 $extension2")
         val projectPath: File = project.projectDir.canonicalFile
 
         println("print message here")
