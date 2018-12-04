@@ -12,10 +12,11 @@ package net.researchgate.release
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.*
-import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.GradleBuild
+import org.gradle.kotlin.dsl.invoke
+import org.gradle.kotlin.dsl.register
 
-class ReleasePluginKotlin : PluginHelper(), Plugin<Project> {
+class ReleasePlugin : PluginHelper(), Plugin<Project> {
 
     companion object {
         val RELEASE_GROUP: String = "Release"
@@ -42,91 +43,84 @@ class ReleasePluginKotlin : PluginHelper(), Plugin<Project> {
 //            val sourceSets = project.extensions.getByType<SourceSetContainer>()
 //            from(sourceSets.named("main").get().allSource)
 //        }
-//        with(project) {
-//            tasks {
-//                register {
-//
-//                }
-//            }
-//        }
-        project.tasks.register<Copy>("myCopyTask") {
-            group = "sample"
-            from("build.gradle.kts")
-            into("build/copy")
+        with(project) {
+            tasks {
+                register<GradleBuild>("release") {
+                    group = RELEASE_GROUP
+                    description = "Verify project, cut release branch, and update version to next."
+                    startParameter = project.gradle.startParameter.newInstance()
+                    tasks = listOf(
+                            "${p}createScmAdapter" as String,
+                            "${p}initScmAdapter" as String,
+                            "${p}checkCommitNeeded" as String,
+                            "${p}checkUpdateNeeded" as String,
+                            "${p}checkoutMergeToReleaseBranch" as String,
+                            "${p}unSnapshotVersion" as String,
+                            "${p}confirmReleaseVersion" as String,
+                            "${p}checkSnapshotDependencies" as String,
+                            "${p}runBuildTasks" as String,
+                            "${p}checkoutMergeFromReleaseBranch" as String,
+                            "${p}updateVersion" as String,
+                            "${p}commitNewVersion" as String
+                    )
+                }
+                register<GradleBuild>("blah") {
+                    description = "Verify project, cut release branch, and update version to next."
+                    group = RELEASE_GROUP
+                    println("TESTING")
+                    println("extension ${extension.useAutomaticVersion}")
+                }
+                register<GradleBuild>("promote") {
+                    description = "Tag end of release, promote to release repo"
+                    group = RELEASE_GROUP
+                    startParameter = project.getGradle().startParameter.newInstance()
+
+                    tasks = listOf(
+                            "${p}createScmAdapter" as String,
+                            "${p}initScmAdapter" as String,
+                            "${p}checkCommitNeeded" as String,
+                            "${p}checkUpdateNeeded" as String,
+                            "${p}unSnapshotVersion" as String,
+                            "${p}isReleaseOrHotfixBranch" as String,
+                            "${p}confirmReleaseVersion" as String,
+                            "${p}checkSnapshotDependencies" as String,
+                            "${p}runBuildTasks" as String,
+                            "${p}preTagCommit" as String,
+                            "${p}createReleaseTag" as String,
+                            "${p}checkoutMergeFromReleaseBranch" as String,
+                            "${p}updateVersion" as String,
+                            "${p}commitNewVersion" as String
+                    )
+                }
+                val createScmAdapterTask = register<CreateScmAdapterTask>("createScmAdapter") {
+                    group = RELEASE_GROUP
+                    description = "Finds the correct SCM plugin"
+                }
+                register<InitScmAdapterTask>("initScmAdapter") {
+                    group = RELEASE_GROUP
+                    description = "Initializes the SCM plugin"
+                }
+                register<CheckCommitNeededTask>("checkCommitNeeded") {
+                    dependsOn(createScmAdapterTask)
+                    group = RELEASE_GROUP
+                    description = "Checks to see if there are any added, modified, removed, or un-versioned files."
+                }
+                register<CheckUpdateNeededTask>("checkUpdateNeeded") {
+                    dependsOn(createScmAdapterTask)
+                    group = RELEASE_GROUP
+                    description = "Checks to see if there are any incoming or outgoing changes that haven\"t been applied locally."
+                }
+                register<CheckoutMergeToReleaseBranchTask>("checkoutMergeToReleaseBranch") {
+                    group = RELEASE_GROUP
+                    description = "Checkout to the release branch, and merge modifications from the main branch in working tree."
+                    onlyIf {
+                        extension.pushReleaseVersionBranch
+                    }
+                }
+            }
         }
     }
-}
-//        project.task(mapOf("description" to "Verify project, cut release branch, and update version to next.",
-//                "group" to RELEASE_GROUP, "type" to GradleBuild::class.java), "release") {
-            //            startParameter = project.getGradle().startParameter.newInstance()
 
-//            tasks = [
-//                "${p}createScmAdapter" as String,
-//                "${p}initScmAdapter" as String,
-//                "${p}checkCommitNeeded" as String,
-//                "${p}checkUpdateNeeded" as String,
-//                "${p}checkoutMergeToReleaseBranch" as String,
-//                "${p}unSnapshotVersion" as String,
-//                "${p}confirmReleaseVersion" as String,
-//                "${p}checkSnapshotDependencies" as String,
-//                "${p}runBuildTasks" as String,
-//                    "${p}preTagCommit" as String,
-//                    "${p}createReleaseTag" as String,
-//                "${p}checkoutMergeFromReleaseBranch" as String,
-//                "${p}updateVersion" as String,
-//                "${p}commitNewVersion" as String
-//            ]
-//        }
-//        project.task("blah", description: "Verify project, cut release branch, and update version to next.", group: RELEASE_GROUP, type: GradleBuild) doLast {
-//            println("TESTING")
-//            println("extension ${extension.useAutomaticVersion}")
-//        }
-//
-//        project.task("promote", description: "Tag end of release, promote to release repo", group: RELEASE_GROUP, type: GradleBuild) {
-//            startParameter = project.getGradle().startParameter.newInstance()
-//
-//            tasks = [
-//                "${p}createScmAdapter" as String,
-//                "${p}initScmAdapter" as String,
-//                "${p}checkCommitNeeded" as String,
-//                "${p}checkUpdateNeeded" as String,
-//                "${p}unSnapshotVersion" as String,
-//                "${p}isReleaseOrHotfixBranch" as String,
-//                "${p}confirmReleaseVersion" as String,
-//                "${p}checkSnapshotDependencies" as String,
-//                "${p}runBuildTasks" as String,
-//                "${p}preTagCommit" as String,
-//                "${p}createReleaseTag" as String,
-//                "${p}checkoutMergeFromReleaseBranch" as String,
-//                "${p}updateVersion" as String,
-//                "${p}commitNewVersion" as String
-//            ]
-//        }
-//
-//        CreateScmAdapterTask createScmAdapterTask = project . task ("createScmAdapter", type: CreateScmAdapterTask.class) {
-//            group = RELEASE_GROUP
-//            description = "Finds the correct SCM plugin"
-//        }
-//        project.task("initScmAdapter", type: InitScmAdapterTask.class) {
-//            group = RELEASE_GROUP
-//            description = "Initializes the SCM plugin"
-//        }
-//        project.task("checkCommitNeeded", type: CheckCommitNeededTask.class, dependsOn: createScmAdapterTask) {
-//            group = RELEASE_GROUP
-//            description = "Checks to see if there are any added, modified, removed, or un-versioned files."
-//        }
-//        project.task("checkUpdateNeeded", type: CheckUpdateNeededTask.class, dependsOn: createScmAdapterTask) {
-//            group = RELEASE_GROUP
-//            description = "Checks to see if there are any incoming or outgoing changes that haven\"t been applied locally."
-//        }
-//        project.task("checkoutMergeToReleaseBranch", type: CheckoutMergeToReleaseBranchTask.class) {
-//            group = RELEASE_GROUP
-//            description = "Checkout to the release branch, and merge modifications from the main branch in working tree."
-//            onlyIf
-//            {
-//                extension.pushReleaseVersionBranch
-//            }
-//        }
 //        project.task("unSnapshotVersion", group: RELEASE_GROUP,
 //                description: "Removes "-SNAPSHOT" from your project\"s current version.") doLast this.&unSnapshotVersion
 //        project.task("isReleaseOrHotfixBranch", group: RELEASE_GROUP,
@@ -448,4 +442,6 @@ class ReleasePluginKotlin : PluginHelper(), Plugin<Project> {
 //
 //        adapter
 //    }
-//    }
+//}
+//}
+}
