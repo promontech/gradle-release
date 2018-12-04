@@ -12,6 +12,8 @@ package net.researchgate.release
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.*
+import org.gradle.api.tasks.Copy
 
 class ReleasePluginKotlin : PluginHelper(), Plugin<Project> {
 
@@ -47,17 +49,10 @@ class ReleasePluginKotlin : PluginHelper(), Plugin<Project> {
 //                }
 //            }
 //        }
-        project.tasks {
-
-        }
-        project.run {
-            tasks {
-                register("myCopyTask", Copy::class) {
-                    group = "sample"
-                    from("build.gradle.kts")
-                    into("build/copy")
-                }
-            }
+        project.tasks.register<Copy>("myCopyTask") {
+            group = "sample"
+            from("build.gradle.kts")
+            into("build/copy")
         }
     }
 }
