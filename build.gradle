@@ -12,6 +12,8 @@
 //}
 
 plugins {
+//    id 'kotlin-dsl'
+    id "org.gradle.kotlin.kotlin-dsl" version "1.0.4"
     id 'groovy'
     id 'java-gradle-plugin'
     id "com.jfrog.artifactory" version "4.8.1"

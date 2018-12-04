@@ -102,9 +102,9 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             group = RELEASE_GROUP
             description = 'Checks to see if there are any incoming or outgoing changes that haven\'t been applied locally.'
         }
-        project.task('checkoutMergeToReleaseBranch', group: RELEASE_GROUP,
-                description: 'Checkout to the release branch, and merge modifications from the main branch in working tree.') {
-            doLast this.&checkoutAndMergeToReleaseBranch
+        project.task('checkoutMergeToReleaseBranch', type: CheckoutMergeToReleaseBranchTask.class) {
+            group = RELEASE_GROUP
+            description = 'Checkout to the release branch, and merge modifications from the main branch in working tree.'
             onlyIf {
                 extension.pushReleaseVersionBranch
             }

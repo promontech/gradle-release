@@ -31,7 +31,7 @@ class ReleaseExtension {
     String tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
     String newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
     String releaseVersionCommitMessage = '[Gradle Release Plugin] - release version commit: '
-    def pushReleaseVersionBranch = false
+    boolean pushReleaseVersionBranch = false
 
     /**
      * as of 3.0 set this to "$version" by default
