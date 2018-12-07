@@ -18,10 +18,10 @@ import org.gradle.kotlin.dsl.register
 
 class ReleasePlugin : PluginHelper(), Plugin<Project> {
 
-    companion object {
+//    companion object {
         val RELEASE_GROUP: String = "Release"
         val PROMOTE_GROUP: String = "Promote"
-    }
+//    }
 
     private lateinit var scmAdapter: BaseScmAdapter
 
@@ -96,10 +96,6 @@ class ReleasePlugin : PluginHelper(), Plugin<Project> {
                     group = RELEASE_GROUP
                     description = "Finds the correct SCM plugin"
                 }
-                register<InitScmAdapterTask>("initScmAdapter") {
-                    group = RELEASE_GROUP
-                    description = "Initializes the SCM plugin"
-                }
                 register<CheckCommitNeededTask>("checkCommitNeeded") {
                     dependsOn(createScmAdapterTask)
                     group = RELEASE_GROUP
@@ -111,6 +107,7 @@ class ReleasePlugin : PluginHelper(), Plugin<Project> {
                     description = "Checks to see if there are any incoming or outgoing changes that haven\"t been applied locally."
                 }
                 register<CheckoutMergeToReleaseBranchTask>("checkoutMergeToReleaseBranch") {
+                    dependsOn(createScmAdapterTask)
                     group = RELEASE_GROUP
                     description = "Checkout to the release branch, and merge modifications from the main branch in working tree."
                     onlyIf {

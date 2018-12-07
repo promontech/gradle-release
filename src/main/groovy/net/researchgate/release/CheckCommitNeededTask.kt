@@ -11,7 +11,6 @@ open class CheckCommitNeededTask : DefaultTask() {
 
     @TaskAction
     fun createScmAdapter() {
-        println("CheckCommitNeededTask")
         scmAdapter = project.tasks.getByPath("createScmAdapter").property("scmAdapter") as BaseScmAdapter
         scmAdapter!!.checkCommitNeeded()
     }

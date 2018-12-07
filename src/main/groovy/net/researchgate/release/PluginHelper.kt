@@ -19,16 +19,16 @@ import java.io.File
 
 open class PluginHelper {
 
-    companion object {
+//    companion object {
         private val LINE_SEP: String = System.getProperty("line.separator")
         private val PROMPT: String = "${LINE_SEP}??>"
-    }
+//    }
 
     protected open lateinit var project: Project
 
     protected lateinit var extension: ReleaseExtension
 
-    protected val executor: Executor = Executor(project.logger)
+    protected val executor: Executor by lazy { Executor(project.logger) }
 
     protected open var attributes: MutableMap<String, Any> = mutableMapOf()
 

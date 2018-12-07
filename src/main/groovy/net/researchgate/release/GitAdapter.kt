@@ -16,23 +16,24 @@ import java.io.File
 
 class GitAdapter(project: Project, attributes: MutableMap<String, Any>) : BaseScmAdapter(project, attributes) {
 
-    init {
-        workingBranch = getBranch()
-        pushReleaseVersionBranch = extension.pushReleaseVersionBranch
-    }
 
-    companion object {
-        private const val LINE: String = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+//    companion object {
+        private val LINE: String = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-        private const val UNCOMMITTED: String = "uncommitted"
-        private const val UNVERSIONED: String = "unversioned"
-        private const val AHEAD: String = "ahead"
-        private const val BEHIND: String = "behind"
+        private val UNCOMMITTED: String = "uncommitted"
+        private val UNVERSIONED: String = "unversioned"
+        private val AHEAD: String = "ahead"
+        private val BEHIND: String = "behind"
 
-        private lateinit var workingBranch: String
+        private var workingBranch: String
         private var pushReleaseVersionBranch: Boolean? = null
 
         private lateinit var workingDirectory: File
+//    }
+
+    init {
+        workingBranch = getBranch()
+        pushReleaseVersionBranch = extension.pushReleaseVersionBranch
     }
 
     inner class GitConfig {

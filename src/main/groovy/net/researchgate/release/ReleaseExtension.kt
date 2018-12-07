@@ -18,7 +18,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.primaryConstructor
 
-class ReleaseExtension(val project: Project, val attributes: MutableMap<String, Any>) {
+open class ReleaseExtension(val project: Project, val attributes: MutableMap<String, Any>) {
 
     var failOnCommitNeeded: Boolean = true
     var failOnPublishNeeded: Boolean = true
