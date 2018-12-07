@@ -2,9 +2,11 @@ package net.researchgate.release
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import kotlin.reflect.KClass
+import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.full.primaryConstructor
 
 /**
  * Create the SCM adapter based on the type of SCM in use in the project
@@ -15,18 +17,17 @@ open class CreateScmAdapterTask : DefaultTask() {
 
     @TaskAction
     fun createScmAdapter() {
-        println("Creating SCM Adapter")
-
         val projectPath: File = project.projectDir.canonicalFile
 
-        val instance: Class<out BaseScmAdapter>? = extension.scmAdapters.find {
-            assert(BaseScmAdapter::class.java.isAssignableFrom(it))
+        val instance: KClass<out BaseScmAdapter>? = extension.scmAdapters.find {
+            assert(it.isSubclassOf(BaseScmAdapter::class))
 
-            val instance: BaseScmAdapter = it.getConstructor(Project::class.java, Map::class.java).newInstance(project,null) //, this.attributes)
+            val instance: BaseScmAdapter = it.primaryConstructor?.call(project, extension.attributes)
+                    ?: throw GradleException("Failed to call primary constructor with $project and ${extension.attributes}")
             instance.isSupported(projectPath)
         }
 
-        scmAdapter = instance?.getConstructor(Project::class.java, Map::class.java)?.newInstance(project, null)/*extension2.attributes)*/
+        scmAdapter = instance?.primaryConstructor?.call(project, extension.attributes)
                 ?: throw GradleException("No supported Adapter could be found. Are [${projectPath}] or its parents are valid scm directories?")
         scmAdapter!!.init()
     }
