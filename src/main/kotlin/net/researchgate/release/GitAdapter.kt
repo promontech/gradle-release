@@ -1,4 +1,4 @@
-/*
+package net.researchgate.release/*
  * This file is part of the gradle-release plugin.
  *
  * (c) Eric Berry
@@ -8,11 +8,10 @@
  * file that was distributed with this source code.
  */
 
-package net.researchgate.release
-
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import java.io.File
+import kotlin.collections.set
 
 class GitAdapter(project: Project, attributes: MutableMap<String, Any>) : BaseScmAdapter(project, attributes) {
 

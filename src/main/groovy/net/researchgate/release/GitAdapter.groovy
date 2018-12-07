@@ -15,7 +15,7 @@
 //
 //import java.util.regex.Matcher
 //
-//class GitAdapter extends BaseScmAdapter {
+//class GitAdapter extends net.researchgate.release.BaseScmAdapter {
 //
 //    private static final String LINE = '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
 //

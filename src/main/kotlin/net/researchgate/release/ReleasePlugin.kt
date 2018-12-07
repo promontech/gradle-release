@@ -1,4 +1,4 @@
-/*
+package net.researchgate.release/*
  * This file is part of the gradle-release plugin.
  *
  * (c) Eric Berry
@@ -8,24 +8,40 @@
  * file that was distributed with this source code.
  */
 
-package net.researchgate.release
-
+import net.researchgate.release.cli.Executor
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.GradleBuild
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.register
 
-class ReleasePlugin : PluginHelper(), Plugin<Project> {
-
-//    companion object {
+class ReleasePlugin() : Plugin<Project> {
+    companion object {
         val RELEASE_GROUP: String = "Release"
         val PROMOTE_GROUP: String = "Promote"
-//    }
+    }
 
     private lateinit var scmAdapter: BaseScmAdapter
 
+    private lateinit var project: Project
+    private lateinit var extension: ReleaseExtension
+    private val executor: Executor by lazy { Executor(project.logger) }
+    private var attributes: MutableMap<String, Any> = mutableMapOf()
+
     override fun apply(project: Project) {
+        fun findProperty(key: String, defaultVal: String? = null, deprecatedKey: String? = null): String? {
+            var property: String? = System.getProperty(key) ?: project.findProperty(key) as String?
+
+            if (!property.isNullOrBlank() && !deprecatedKey.isNullOrBlank()) {
+                property = System.getProperty(deprecatedKey) ?: project.findProperty(deprecatedKey) as String?
+                if (!property.isNullOrBlank()) {
+                    project.logger.warn("You are using the deprecated parameter '${deprecatedKey}'. Please use the new parameter '$key'. The deprecated parameter will be removed in 3.0")
+                }
+            }
+
+            return property ?: defaultVal
+        }
+
         this.project = project
         extension = project.extensions.create("release", ReleaseExtension::class.java, project, attributes)
 
@@ -50,18 +66,18 @@ class ReleasePlugin : PluginHelper(), Plugin<Project> {
                     description = "Verify project, cut release branch, and update version to next."
                     startParameter = project.gradle.startParameter.newInstance()
                     tasks = listOf(
-                            "${p}createScmAdapter" as String,
-                            "${p}initScmAdapter" as String,
-                            "${p}checkCommitNeeded" as String,
-                            "${p}checkUpdateNeeded" as String,
-                            "${p}checkoutMergeToReleaseBranch" as String,
-                            "${p}unSnapshotVersion" as String,
-                            "${p}confirmReleaseVersion" as String,
-                            "${p}checkSnapshotDependencies" as String,
-                            "${p}runBuildTasks" as String,
-                            "${p}checkoutMergeFromReleaseBranch" as String,
-                            "${p}updateVersion" as String,
-                            "${p}commitNewVersion" as String
+                            "${p}createScmAdapter",
+                            "${p}initScmAdapter",
+                            "${p}checkCommitNeeded",
+                            "${p}checkUpdateNeeded",
+                            "${p}checkoutMergeToReleaseBranch",
+                            "${p}unSnapshotVersion",
+                            "${p}confirmReleaseVersion",
+                            "${p}checkSnapshotDependencies",
+                            "${p}runBuildTasks",
+                            "${p}checkoutMergeFromReleaseBranch",
+                            "${p}updateVersion",
+                            "${p}commitNewVersion"
                     )
                 }
                 register<GradleBuild>("blah") {
@@ -76,20 +92,20 @@ class ReleasePlugin : PluginHelper(), Plugin<Project> {
                     startParameter = project.getGradle().startParameter.newInstance()
 
                     tasks = listOf(
-                            "${p}createScmAdapter" as String,
-                            "${p}initScmAdapter" as String,
-                            "${p}checkCommitNeeded" as String,
-                            "${p}checkUpdateNeeded" as String,
-                            "${p}unSnapshotVersion" as String,
-                            "${p}isReleaseOrHotfixBranch" as String,
-                            "${p}confirmReleaseVersion" as String,
-                            "${p}checkSnapshotDependencies" as String,
-                            "${p}runBuildTasks" as String,
-                            "${p}preTagCommit" as String,
-                            "${p}createReleaseTag" as String,
-                            "${p}checkoutMergeFromReleaseBranch" as String,
-                            "${p}updateVersion" as String,
-                            "${p}commitNewVersion" as String
+                            "${p}createScmAdapter",
+                            "${p}initScmAdapter",
+                            "${p}checkCommitNeeded",
+                            "${p}checkUpdateNeeded",
+                            "${p}unSnapshotVersion",
+                            "${p}isReleaseOrHotfixBranch",
+                            "${p}confirmReleaseVersion",
+                            "${p}checkSnapshotDependencies",
+                            "${p}runBuildTasks",
+                            "${p}preTagCommit",
+                            "${p}createReleaseTag",
+                            "${p}checkoutMergeFromReleaseBranch",
+                            "${p}updateVersion",
+                            "${p}commitNewVersion"
                     )
                 }
                 val createScmAdapterTask = register<CreateScmAdapterTask>("createScmAdapter") {
@@ -415,15 +431,15 @@ class ReleasePlugin : PluginHelper(), Plugin<Project> {
 //     * Recursively look for the type of the SCM we are dealing with, if no match is found look in parent directory
 //     * @param directory the directory to start from
 //     */
-//    protected BaseScmAdapter findScmAdapter()
+//    protected net.researchgate.release.BaseScmAdapter findScmAdapter()
 //    {
-//        BaseScmAdapter adapter
+//        net.researchgate.release.BaseScmAdapter adapter
 //                File projectPath = project . projectDir . canonicalFile
 //
 //                extension.scmAdapters.find {
-//                    assert BaseScmAdapter . isAssignableFrom (it)
+//                    assert net.researchgate.release.BaseScmAdapter . isAssignableFrom (it)
 //
-//                    BaseScmAdapter instance = it . getConstructor (Project.class, Map .class).newInstance(project, attributes)
+//                    net.researchgate.release.BaseScmAdapter instance = it . getConstructor (Project.class, Map .class).newInstance(project, attributes)
 //                    if (instance.isSupported(projectPath)) {
 //                        adapter = instance
 //                        return true

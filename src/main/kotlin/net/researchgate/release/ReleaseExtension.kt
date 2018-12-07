@@ -1,4 +1,4 @@
-/*
+package net.researchgate.release/*
  * This file is part of the gradle-release plugin.
  *
  * (c) Eric Berry
@@ -7,8 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-package net.researchgate.release
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -63,7 +61,7 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
         }
 
 //    init {
-//        ExpandoMetaClass mc = new ExpandoMetaClass(ReleaseExtension, false, true)
+//        ExpandoMetaClass mc = new ExpandoMetaClass(net.researchgate.release.ReleaseExtension, false, true)
 //        mc.initialize()
 //        metaClass = mc
 //    }
@@ -78,7 +76,7 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
 //
 //            return metaClass."$name" = value
 //        }
-//        BaseScmAdapter adapter = getAdapterForName(name)
+//        net.researchgate.release.BaseScmAdapter adapter = getAdapterForName(name)
 //        Object result = adapter?.createNewConfig()
 //
 //        if (!adapter || !result) {
@@ -95,7 +93,7 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
 //
 //            return metaClass."$name" = value
 //        }
-//        BaseScmAdapter adapter = getAdapterForName(name)
+//        net.researchgate.release.BaseScmAdapter adapter = getAdapterForName(name)
 //
 //        if (!adapter) {
 //            throw new MissingPropertyException(name, this.class)

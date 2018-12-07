@@ -13,7 +13,7 @@
 //import org.gradle.api.GradleException
 //import org.gradle.api.Project
 //
-//class BzrAdapter extends BaseScmAdapter {
+//class BzrAdapter extends net.researchgate.release.BaseScmAdapter {
 //
 //    private static final String ERROR = 'ERROR'
 //    private static final String DELIM = '\n  * '

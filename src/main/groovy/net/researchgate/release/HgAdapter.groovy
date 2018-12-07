@@ -12,7 +12,7 @@
 //
 //import org.gradle.api.Project
 //
-//class HgAdapter extends BaseScmAdapter {
+//class HgAdapter extends net.researchgate.release.BaseScmAdapter {
 //
 //    private static final String ERROR = 'abort:'
 //

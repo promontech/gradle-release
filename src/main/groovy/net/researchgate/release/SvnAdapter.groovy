@@ -15,7 +15,7 @@
 //import java.util.regex.Matcher
 //import org.gradle.api.GradleException
 //
-//class SvnAdapter extends BaseScmAdapter {
+//class SvnAdapter extends net.researchgate.release.BaseScmAdapter {
 //
 //    private static final String ERROR = 'Commit failed'
 //

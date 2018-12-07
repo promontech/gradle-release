@@ -22,7 +22,7 @@
 //
 //    def setup() {
 //        project = ProjectBuilder.builder().withName('ReleasePluginTest').build()
-//        project.apply plugin: ReleasePlugin
+//        project.apply plugin: net.researchgate.release.ReleasePlugin
 //        project.version = '1.0.0'
 //
 //        svnAdapter = new SvnAdapter(project, [:])
