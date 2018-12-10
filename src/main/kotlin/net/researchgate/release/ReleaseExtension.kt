@@ -55,10 +55,11 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
 //            BzrAdapter::class
     )
 
-    val git: GitAdapter.GitConfig
+    var git: GitAdapter.GitConfig? = null
         get() {
             return GitAdapter(project, attributes).GitConfig()
         }
+
 
 //    init {
 //        ExpandoMetaClass mc = new ExpandoMetaClass(net.researchgate.release.ReleaseExtension, false, true)

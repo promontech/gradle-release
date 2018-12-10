@@ -30,9 +30,13 @@ class GitAdapter(project: Project, attributes: MutableMap<String, Any>) : BaseSc
         private lateinit var workingDirectory: File
 //    }
 
+    private val gitConfig: GitConfig
+
     init {
         workingBranch = getBranch()
         pushReleaseVersionBranch = extension.pushReleaseVersionBranch
+        // not actually possible for this to be null unless someone messes up the order of construction
+        gitConfig = extension.git ?: throw GradleException("Git config must be provided")
     }
 
     inner class GitConfig {
@@ -71,8 +75,8 @@ class GitAdapter(project: Project, attributes: MutableMap<String, Any>) : BaseSc
     }
 
     override fun init() {
-        if (workingBranch.matches(extension.git.requireBranch.toRegex()).not()) {
-            throw GradleException("Current Git branch is \"$workingBranch\" and not \"${extension.git.requireBranch}\".")
+        if (workingBranch.matches(gitConfig.requireBranch.toRegex()).not()) {
+            throw GradleException("Current Git branch is \"$workingBranch\" and not \"${gitConfig.requireBranch}\".")
         }
     }
 
@@ -101,14 +105,14 @@ class GitAdapter(project: Project, attributes: MutableMap<String, Any>) : BaseSc
     override fun createReleaseTag(message: String) {
         val tagName = tagName()
         val params = mutableListOf("git", "tag", "-a", tagName, "-m", message)
-        if (extension.git.signTag) {
+        if (gitConfig.signTag) {
             params.add("-s")
         }
         exec(params = params, directory = workingDirectory, errorMessage = "Duplicate tag [$tagName]", errorPatterns = listOf("already exists"))
 
         if (shouldPush()) {
-            val params1 = mutableListOf<String>("git", "push", "--porcelain", extension.git.pushToRemote, tagName)
-            params1.addAll(extension.git.pushOptions)
+            val params1 = mutableListOf<String>("git", "push", "--porcelain", gitConfig.pushToRemote, tagName)
+            params1.addAll(gitConfig.pushOptions)
             exec(params = params1,
                     directory = workingDirectory,
                     errorMessage = "Failed to push tag [$tagName] to remote",
@@ -131,8 +135,8 @@ class GitAdapter(project: Project, attributes: MutableMap<String, Any>) : BaseSc
 
     override fun commit(message: String) {
         val command: MutableList<String> = mutableListOf("git", "commit", "-m", message)
-        if (extension.git.commitVersionFileOnly) {
-            project?.file(extension.versionPropertyFile)?.absolutePath?.let { command.add(it) }
+        if (gitConfig.commitVersionFileOnly) {
+            project.file(extension.versionPropertyFile).absolutePath?.let { command.add(it) }
         } else {
             command.add("-a")
         }
@@ -141,11 +145,11 @@ class GitAdapter(project: Project, attributes: MutableMap<String, Any>) : BaseSc
 
         if (shouldPush()) {
             var branch = getBranch()
-            if (extension.git.pushToBranchPrefix.isNotEmpty()) {
-                branch = "HEAD:${extension.git.pushToBranchPrefix}$branch"
+            if (gitConfig.pushToBranchPrefix.isNotEmpty()) {
+                branch = "HEAD:${gitConfig.pushToBranchPrefix}$branch"
             }
-            val params = mutableListOf("git", "push", "--porcelain", extension.git.pushToRemote, branch)
-            params.addAll(extension.git.pushOptions)
+            val params = mutableListOf("git", "push", "--porcelain", gitConfig.pushToRemote, branch)
+            params.addAll(gitConfig.pushOptions)
             exec(params = params, directory = workingDirectory, errorMessage = "Failed to push to remote", errorPatterns = listOf("[rejected]", "error: ", "fatal: "))
         }
     }
@@ -199,13 +203,13 @@ class GitAdapter(project: Project, attributes: MutableMap<String, Any>) : BaseSc
             val regex = Regex("""^\s*(.*)\s*${'$'}""")
             if (regex.matches(line)) {
                 val match = regex.matchEntire(line)
-                if (match?.groupValues?.get(1) == extension.git.pushToRemote) {
+                if (match?.groupValues?.get(1) == gitConfig.pushToRemote) {
                     shouldPush = true
                 }
             }
         }
-        if (!shouldPush && extension.git.pushToRemote != "origin") {
-            throw GradleException("Could not push to remote ${extension.git.pushToRemote} as repository has no such remote")
+        if (!shouldPush && gitConfig.pushToRemote != "origin") {
+            throw GradleException("Could not push to remote ${gitConfig.pushToRemote} as repository has no such remote")
         }
 
         return shouldPush
