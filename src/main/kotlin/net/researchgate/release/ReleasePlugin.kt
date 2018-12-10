@@ -16,10 +16,10 @@ import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.register
 
 class ReleasePlugin() : Plugin<Project> {
-    companion object {
+//    companion object {
         val RELEASE_GROUP: String = "Release"
         val PROMOTE_GROUP: String = "Promote"
-    }
+//    }
 
     private lateinit var scmAdapter: BaseScmAdapter
 
