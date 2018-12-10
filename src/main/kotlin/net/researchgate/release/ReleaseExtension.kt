@@ -18,6 +18,9 @@ import kotlin.reflect.full.primaryConstructor
 
 open class ReleaseExtension(val project: Project, val attributes: MutableMap<String, Any>) {
 
+    init {
+        println("Attribute $attributes")
+    }
     var failOnCommitNeeded: Boolean = true
     var failOnPublishNeeded: Boolean = true
     var failOnSnapshotDependencies: Boolean = true
@@ -56,10 +59,6 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
     )
 
     var git: GitAdapter.GitConfig? = null
-        get() {
-            return GitAdapter(project, attributes).GitConfig()
-        }
-
 
 //    init {
 //        ExpandoMetaClass mc = new ExpandoMetaClass(net.researchgate.release.ReleaseExtension, false, true)
