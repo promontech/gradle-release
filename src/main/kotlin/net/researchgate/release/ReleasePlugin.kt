@@ -53,12 +53,6 @@ class ReleasePlugin() : Plugin<Project> {
         // name tasks with an absolute path so subprojects can be released independently
         var p: String = project.path
         p = if (!p.endsWith(Project.PATH_SEPARATOR)) p + Project.PATH_SEPARATOR else p
-//        project.tasks.registering(Jar::class) {
-//            dependsOn("classes")
-//            classifier = "sources"
-//            val sourceSets = project.extensions.getByType<SourceSetContainer>()
-//            from(sourceSets.named("main").get().allSource)
-//        }
         with(project) {
             tasks {
                 register<GradleBuild>("release") {

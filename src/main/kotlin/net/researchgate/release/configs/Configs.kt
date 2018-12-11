@@ -1,6 +1,7 @@
 package net.researchgate.release.configs
 
 
+// TODO tyler figure out if we should use PolymorphicDomainObjectContainer for dynamic config
 class GitConfig {
     var requireBranch = "master"
     var pushToRemote = "origin" // needs to be def as can be boolean or string

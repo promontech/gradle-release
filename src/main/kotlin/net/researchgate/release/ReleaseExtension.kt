@@ -20,11 +20,6 @@ import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.primaryConstructor
 
 open class ReleaseExtension(val project: Project, val attributes: MutableMap<String, Any>) {
-
-    init {
-        println("Attribute $attributes")
-    }
-
     var failOnCommitNeeded: Boolean = true
     var failOnPublishNeeded: Boolean = true
     var failOnSnapshotDependencies: Boolean = true
