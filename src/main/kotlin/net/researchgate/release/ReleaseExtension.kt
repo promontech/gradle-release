@@ -1,4 +1,6 @@
-package net.researchgate.release/*
+package net.researchgate.release
+
+/*
  * This file is part of the gradle-release plugin.
  *
  * (c) Eric Berry
@@ -8,9 +10,10 @@ package net.researchgate.release/*
  * file that was distributed with this source code.
  */
 
+import net.researchgate.release.configs.GitConfig
+import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-
 import java.util.regex.Pattern
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
@@ -21,6 +24,7 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
     init {
         println("Attribute $attributes")
     }
+
     var failOnCommitNeeded: Boolean = true
     var failOnPublishNeeded: Boolean = true
     var failOnSnapshotDependencies: Boolean = true
@@ -58,7 +62,11 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
 //            BzrAdapter::class
     )
 
-    var git: GitAdapter.GitConfig? = null
+    var git: GitConfig = GitConfig()
+
+    fun git(action: Action<GitConfig>) {
+        git.let { action.execute(it) }
+    }
 
 //    init {
 //        ExpandoMetaClass mc = new ExpandoMetaClass(net.researchgate.release.ReleaseExtension, false, true)
@@ -116,7 +124,7 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
     private fun isDeprecatedOption(name: String) = name == "includeProjectNameInTag" || name == "tagPrefix"
 
     private fun getAdapterForName(name: String): BaseScmAdapter {
-        val adapter = scmAdapters.filter { it.isSubclassOf(BaseScmAdapter::class) }.first {
+        val adapter = this.scmAdapters.filter { it.isSubclassOf(BaseScmAdapter::class) }.first {
             val pattern: Pattern = Pattern.compile("^$name", Pattern.CASE_INSENSITIVE)
             pattern.matcher(it.simpleName).find()
         }

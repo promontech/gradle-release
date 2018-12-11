@@ -21,8 +21,6 @@ abstract class BaseScmAdapter(override var project: Project, override var attrib
         extension = project.extensions["release"] as ReleaseExtension
     }
 
-    abstract fun createNewConfig(): Any
-
     abstract fun isSupported(directory: File): Boolean
 
     abstract fun init()

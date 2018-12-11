@@ -8,61 +8,32 @@ package net.researchgate.release/*
  * file that was distributed with this source code.
  */
 
+import net.researchgate.release.configs.GitConfig
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import java.io.File
 import kotlin.collections.set
 
 class GitAdapter(project: Project, attributes: MutableMap<String, Any>) : BaseScmAdapter(project, attributes) {
+    companion object {
+        private const val LINE: String = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
+        private const val UNCOMMITTED: String = "uncommitted"
+        private const val UNVERSIONED: String = "unversioned"
+        private const val AHEAD: String = "ahead"
+        private const val BEHIND: String = "behind"
 
-//    companion object {
-        private val LINE: String = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-
-        private val UNCOMMITTED: String = "uncommitted"
-        private val UNVERSIONED: String = "unversioned"
-        private val AHEAD: String = "ahead"
-        private val BEHIND: String = "behind"
-
-        private var workingBranch: String
+        private lateinit var workingBranch: String
         private var pushReleaseVersionBranch: Boolean? = null
 
         private lateinit var workingDirectory: File
-//    }
+    }
 
-    private val gitConfig: GitConfig
+    private lateinit var gitConfig: GitConfig
 
     init {
         workingBranch = getBranch()
         pushReleaseVersionBranch = extension.pushReleaseVersionBranch
-        // not actually possible for this to be null unless someone messes up the order of construction
-        gitConfig = extension.git ?: throw GradleException("Git config must be provided")
-    }
-
-    inner class GitConfig {
-        var requireBranch = "master"
-        var pushToRemote = "origin" // needs to be def as can be boolean or string
-        var pushOptions = emptyList<String>()
-        var signTag = false
-
-        /** @deprecated Remove in version 3.0  */
-        @Deprecated("You are setting the deprecated and unused option pushToCurrentBranch. You can safely remove it. The deprecated option will be removed in 3.0")
-        var pushToCurrentBranch = false
-        var pushToBranchPrefix: String = ""
-        var commitVersionFileOnly = false
-
-        fun setProperty(name: String, value: Any) {
-            if (name == "pushToCurrentBranch") {
-                project.logger.warn("You are setting the deprecated and unused option '$name'. You can safely remove it. The deprecated option will be removed in 3.0")
-            }
-
-//            metaClass.setProperty(this, name, value) // TODO tyler examine effect of this
-        }
-    }
-
-
-    override fun createNewConfig(): Any {
-        return GitConfig()
     }
 
     override fun isSupported(directory: File): Boolean {
@@ -75,6 +46,8 @@ class GitAdapter(project: Project, attributes: MutableMap<String, Any>) : BaseSc
     }
 
     override fun init() {
+        // not actually possible for this to be null unless someone messes up the order of construction
+        gitConfig = extension.git
         if (workingBranch.matches(gitConfig.requireBranch.toRegex()).not()) {
             throw GradleException("Current Git branch is \"$workingBranch\" and not \"${gitConfig.requireBranch}\".")
         }
@@ -156,7 +129,7 @@ class GitAdapter(project: Project, attributes: MutableMap<String, Any>) : BaseSc
 
     @Override
     override fun getBranch(): String {
-        return exec(mutableMapOf(), listOf("git", "rev-parse", "--abbrev-ref", "HEAD")).replace("\\s", "")
+        return exec(mutableMapOf(), listOf("git", "rev-parse", "--abbrev-ref", "HEAD")).replace("\\s", "").replace("\n", "")
     }
 
     override fun add(file: File) {
