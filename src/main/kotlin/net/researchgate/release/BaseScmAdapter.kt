@@ -21,6 +21,14 @@ abstract class BaseScmAdapter(override var project: Project, override var attrib
         extension = project.extensions["release"] as ReleaseExtension
     }
 
+    abstract fun  createNewConfig(): Any
+
+    abstract fun  createReleaseTag(message: String, tagName: String)
+
+    abstract fun  revert(file: File)
+
+    abstract fun  getLatestTag(projectName: String): String
+
     abstract fun isSupported(directory: File): Boolean
 
     abstract fun init()

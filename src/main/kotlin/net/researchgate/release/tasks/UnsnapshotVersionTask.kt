@@ -1,12 +1,11 @@
 package net.researchgate.release.tasks
 
 import groovy.text.SimpleTemplateEngine
-import net.researchgate.release.PropertiesFileHandler
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import java.util.*
-import org.gradle.kotlin.dsl.*
+import kotlin.collections.set
 
 /**
  * Check that updates to the project are not needed
@@ -15,7 +14,6 @@ open class UnsnapshotVersionTask : BaseReleaseTask() {
 //    private var scmAdapter: BaseScmAdapter? = null
 //    var extension: ReleaseExtension = project.extensions.getByType(ReleaseExtension::class.java)
 //    private val log: Logger = project.logger
-    private val propertiesFileHandler = PropertiesFileHandler(project, extension)
 
     init {
         description = "testing 123"
@@ -24,11 +22,9 @@ open class UnsnapshotVersionTask : BaseReleaseTask() {
     @TaskAction
     fun task() {
         if (extension.useMultipleVersionFiles) {
-            project.rootProject.subprojects { project: Project ->
-                unSnapshotVersion(project)
-            }
+            project.rootProject.subprojects { unSnapshotVersion(this) }
         } else {
-            unSnapshotVersion(getProject())
+            unSnapshotVersion(project)
         }
     }
 
@@ -37,7 +33,7 @@ open class UnsnapshotVersionTask : BaseReleaseTask() {
             // Replace the version with the latest released version
             val latestTag = scmAdapter.getLatestTag(projectToUnSnapshot.name) ?: throw GradleException("The latest tag of '" + projectToUnSnapshot.name + "' is not available")
 
-            if (!extension.tagTemplate.isNullOrBlank()) {
+            if (!extension.tagTemplate.isBlank()) {
                 throw GradleException("Skipping a release requires the 'tagTemplate' property to be set")
             }
 
@@ -48,7 +44,7 @@ open class UnsnapshotVersionTask : BaseReleaseTask() {
                     "name" to projectToUnSnapshot.name
             )
             val tagNamePart: String = engine.createTemplate(extension.tagTemplate).make(binding).toString()
-            val version: String = latestTag.replaceAll(tagNamePart, "")
+            val version: String = latestTag.replace(tagNamePart, "")
 
             log.debug("Using version " + version + " for " + projectToUnSnapshot.name + " dependencies")
             projectToUnSnapshot.version = version
@@ -58,7 +54,7 @@ open class UnsnapshotVersionTask : BaseReleaseTask() {
         val version = projectToUnSnapshot.version.toString()
 
         if (version.contains("-SNAPSHOT")) {
-            val projectAttributes: Map<String, Any> = extension.getOrCreateProjectAttributes(projectToUnSnapshot.name)
+            val projectAttributes = extension.getOrCreateProjectAttributes(projectToUnSnapshot.name)
             projectAttributes["usesSnapshot"] = true
             version.replace("-SNAPSHOT","")
             updateVersionProperty(projectToUnSnapshot, version)
@@ -66,8 +62,8 @@ open class UnsnapshotVersionTask : BaseReleaseTask() {
     }
 
 
-    fun checkPropertiesFile() {
-        val propertiesFile = findPropertiesFile()
+    fun checkPropertiesFile(project: Project) {
+        val propertiesFile = findPropertiesFile(project)
         if (!propertiesFile.canRead() || !propertiesFile.canWrite()) {
             throw GradleException("Unable to update version property. Please check file permissions.")
         }

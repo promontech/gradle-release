@@ -27,9 +27,7 @@ open class BaseReleaseTask : DefaultTask() {
         pluginAttributes = extension.attributes
     }
 
-    fun getScmAdapter(): BaseScmAdapter {
-        return extension.scmAdapter
-    }
+    val scmAdapter: BaseScmAdapter = extension.scmAdapter
 
     /**
      * Retrieves SLF4J {@link org.slf4j.Logger} instance.
@@ -157,7 +155,7 @@ open class BaseReleaseTask : DefaultTask() {
      *
      * @param newVersion new version to store in the file
      */
-    fun updateVersionProperty(newVersion: String) {
+    fun updateVersionProperty(project: Project, newVersion: String) {
         val oldVersion = project.version as String
         if (oldVersion != newVersion) {
             project.version = newVersion
