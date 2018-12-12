@@ -26,11 +26,11 @@ open class PluginHelper {
 
     protected open lateinit var project: Project
 
-    protected lateinit var extension: ReleaseExtension
+    protected open lateinit var extension: ReleaseExtension
 
     protected val executor: Executor by lazy { Executor(project.logger) }
 
-    protected open var attributes: MutableMap<String, Any> = mutableMapOf()
+    open var attributes: MutableMap<String, Any> = mutableMapOf()
 
     /**
      * Retrieves SLF4J {@link Logger} instance.
@@ -193,10 +193,11 @@ open class PluginHelper {
         }
         println("$msg (WAITING FOR INPUT BELOW)")
 
-        return System.`in`.reader().readLines()[0] ?: defaultValue!! // todo tyler
+        val value = readLine()
+        return if (value.isNullOrBlank()) defaultValue!! else value
     }
 
-    private fun promptYesOrNo(message: String, defaultValue: Boolean = false): Boolean {
+    fun promptYesOrNo(message: String, defaultValue: Boolean = false): Boolean {
         val defaultStr = if (defaultValue) "Y" else "n"
         val consoleVal = readLine("${message} (Y|n)", defaultStr)
         if (consoleVal.isNotBlank()) {

@@ -1,5 +1,7 @@
-package net.researchgate.release
+package net.researchgate.release.tasks
 
+import net.researchgate.release.BaseScmAdapter
+import net.researchgate.release.ReleaseExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction

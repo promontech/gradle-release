@@ -1,17 +1,18 @@
-package net.researchgate.release
+package net.researchgate.release.tasks
 
+import net.researchgate.release.BaseScmAdapter
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
 /**
- * Check that updates to the project are not needed
+ * Check that commits are not needed 
  */
-open class CheckUpdateNeededTask : DefaultTask() {
+open class CheckCommitNeededTask : DefaultTask() {
     private var scmAdapter: BaseScmAdapter? = null
 
     @TaskAction
-    fun task() {
+    fun createScmAdapter() {
         scmAdapter = project.tasks.getByPath("createScmAdapter").property("scmAdapter") as BaseScmAdapter
-        scmAdapter!!.checkUpdateNeeded()
+        scmAdapter!!.checkCommitNeeded()
     }
 }
