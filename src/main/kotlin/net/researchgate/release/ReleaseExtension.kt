@@ -26,6 +26,7 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
     var failOnUnversionedFiles: Boolean = true
     var failOnUpdateNeeded: Boolean = true
     var revertOnFail: Boolean = true
+    var useMultipleVersionFiles: Boolean = false
     //    @Option(option = 'useAutomaticVersion', description = 'Set the filename of the file to be opened.')
     var useAutomaticVersion: Boolean? = null
     var preCommitText: String = ""
@@ -38,11 +39,14 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
     /**
      * as of 3.0 set this to "$version" by default
      */
-    val tagTemplate: String? = null
+    val tagTemplate: String = "\$version"
     val versionPropertyFile: String = "gradle.properties"
     val versionProperties = emptyList()
     val buildTasks: List<String> = listOf("build")
     val ignoredSnapshotDependencies = emptyList()
+
+    val skipProjectRelease = { project: Project -> false }
+
     var versionPatterns: Map<String, (matcher: MatchGroup, p: Project) -> String> = mapOf(
             // Increments last number: "2.5-SNAPSHOT" => "2.6-SNAPSHOT"
 //            """(\d+)([^\d]*$)""" to { m, p -> m.replaceAll("${(m[0][1] as int) + 1}${m[0][2]}") } // TODO tyler
@@ -56,6 +60,9 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
 //            HgAdapter::class,
 //            BzrAdapter::class
     )
+
+    lateinit var scmAdapter: BaseScmAdapter
+    val projectAttributes: MutableMap<String, MutableMap<String, Any>>  = mutableMapOf() // Specific project attributes used during execution
 
     var git: GitConfig = GitConfig()
 
@@ -116,6 +123,39 @@ open class ReleaseExtension(val project: Project, val attributes: MutableMap<Str
 //        }
 //    }
 //
+
+
+    fun getOrCreateProjectAttributes(projectName: String) : MutableMap<String, Any> {
+        projectAttributes.putIfAbsent(projectName, attributes)
+        return projectAttributes[projectName] ?: mutableMapOf()
+    }
+
+    fun skipRelease(project: Project) : Boolean{
+        // Check if we already have an attribute for this
+        val attributes = getOrCreateProjectAttributes(project.name)
+        val key = "skipRelease"
+        if (attributes.containsKey(key)) {
+            return attributes[key] as Boolean
+        }
+        val forceRelease = project.findProperty("release.${project.name}.force")
+        if (forceRelease != null && forceRelease == "true") {
+            attributes[key] = false
+            return false
+        }
+        val skipReleaseProperty = project.findProperty("release.${project.name}.skipRelease")
+        if (skipReleaseProperty != null && skipReleaseProperty == "true") {
+            attributes[key] = true
+            return true
+        }
+        if (project.hasProperty("release.${project.name}.releaseVersion")) {
+            attributes[key] = false
+            return false
+        }
+        val skipRelease = skipProjectRelease(project)
+        attributes[key] = skipRelease
+        return skipRelease
+    }
+
     private fun isDeprecatedOption(name: String) = name == "includeProjectNameInTag" || name == "tagPrefix"
 
     private fun getAdapterForName(name: String): BaseScmAdapter {
