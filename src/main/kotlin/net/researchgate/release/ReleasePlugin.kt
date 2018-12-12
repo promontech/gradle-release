@@ -1,4 +1,6 @@
-package net.researchgate.release/*
+package net.researchgate.release
+
+/*
  * This file is part of the gradle-release plugin.
  *
  * (c) Eric Berry
@@ -9,16 +11,24 @@ package net.researchgate.release/*
  */
 
 import net.researchgate.release.cli.Executor
+import net.researchgate.release.tasks.CheckCommitNeededTask
+import net.researchgate.release.tasks.CheckUpdateNeededTask
+import net.researchgate.release.tasks.CheckoutMergeToReleaseBranchTask
+import net.researchgate.release.tasks.ConsumerTask
+import net.researchgate.release.tasks.CreateScmAdapterTask
+import net.researchgate.release.tasks.SetVersionsTask
+import net.researchgate.release.tasks.UnsnapshotVersionTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.GradleBuild
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.register
 
 class ReleasePlugin() : Plugin<Project> {
-//    companion object {
-        val RELEASE_GROUP: String = "Release"
-        val PROMOTE_GROUP: String = "Promote"
+    //    companion object {
+    val RELEASE_GROUP: String = "Release"
+    val PROMOTE_GROUP: String = "Promote"
 //    }
 
     private lateinit var scmAdapter: BaseScmAdapter
@@ -124,12 +134,27 @@ class ReleasePlugin() : Plugin<Project> {
                         extension.pushReleaseVersionBranch
                     }
                 }
+                val unsnapshotVersionTask = create<UnsnapshotVersionTask>("unsnapshotVersion") {
+                    group = RELEASE_GROUP
+                    description = "Removes '-SNAPSHOT' from your project\'s current version."
+                }
+
+                val setVersionsTask = register<SetVersionsTask>("setVersions") {
+                    group = RELEASE_GROUP
+                    description = "Creates the gradle.properties file if it doesn't exist"
+                }
+
+                val testProperty = register<ConsumerTask>("test2") {
+                    description = "Verify project, cut release branch, and update version to next."
+                    group = RELEASE_GROUP
+                    println("TESTING")
+                    println("extension ${extension.useAutomaticVersion}")
+                    updatedPropertiesFile.set(setVersionsTask.flatMap { updatedPropertiesFile })
+                }
             }
         }
     }
 
-//        project.task("unSnapshotVersion", group: RELEASE_GROUP,
-//                description: "Removes "-SNAPSHOT" from your project\"s current version.") doLast this.&unSnapshotVersion
 //        project.task("isReleaseOrHotfixBranch", group: RELEASE_GROUP,
 //                description: "Verify repo is on release or hotfix branch to promote") doLast this.&isReleaseOrHotfixBranch
 //        project.task("confirmReleaseVersion", group: RELEASE_GROUP,
