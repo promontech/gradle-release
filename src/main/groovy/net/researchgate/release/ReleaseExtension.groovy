@@ -32,6 +32,8 @@ class ReleaseExtension {
 
     boolean useMultipleVersionFiles = false
 
+    boolean useAutomaticVersion = false
+
     String preCommitText = ''
 
     String preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '

@@ -49,7 +49,7 @@ class BaseReleaseTask extends DefaultTask {
     Logger getLog() { getProject()?.logger ?: LoggerFactory.getLogger(this.class) }
 
     boolean useAutomaticVersion() {
-        findProperty('release.useAutomaticVersion') == 'true'
+        findProperty('release.useAutomaticVersion') == 'true' || extension.useAutomaticVersion
     }
 
     File findPropertiesFile(Project project) {
