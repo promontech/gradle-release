@@ -59,7 +59,7 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
                     "${rootPath}checkSnapshotDependencies" as String,
                     "${rootPath}runBuildTasks" as String,
                     "${rootPath}preTagCommit" as String,
-                    "${rootPath}createReleaseTag" as String,
+//                    "${rootPath}createReleaseTag" as String,
                     "${rootPath}updateVersion" as String,
                     "${rootPath}commitNewVersion" as String
             ]

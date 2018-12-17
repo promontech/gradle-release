@@ -10,6 +10,7 @@
 
 package net.researchgate.release
 
+
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 
@@ -133,7 +134,7 @@ class GitAdapter extends BaseScmAdapter {
         if (shouldPush()) {
             def branch = gitCurrentBranch()
             if (extension.git.pushToBranchPrefix) {
-                branch = "HEAD:${extension.git.pushToBranchPrefix}${project.version}"
+                branch = "HEAD:${extension.git.pushToBranchPrefix}${project.version.replaceAll('-SNAPSHOT', '')}"
             }
             exec(['git', 'push', '--porcelain', extension.git.pushToRemote, branch] + extension.git.pushOptions, directory: workingDirectory, errorMessage: 'Failed to push to remote', errorPatterns: ['[rejected]', 'error: ', 'fatal: '])
         }
