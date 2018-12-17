@@ -18,8 +18,6 @@ import org.gradle.api.Task
 import org.gradle.api.tasks.GradleBuild
 import org.gradle.api.tasks.TaskState
 
-import java.util.regex.Matcher
-
 class ReleasePlugin extends PluginHelper implements Plugin<Project> {
 
     static final String RELEASE_GROUP = 'Release'
@@ -113,8 +111,8 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             project.tasks.checkSnapshotDependencies.mustRunAfter(project.tasks.confirmReleaseVersion)
             project.tasks.runBuildTasks.mustRunAfter(project.tasks.checkSnapshotDependencies)
             project.tasks.preTagCommit.mustRunAfter(project.tasks.runBuildTasks)
-            project.tasks.createReleaseTag.mustRunAfter(project.tasks.preTagCommit)
-            project.tasks.updateVersion.mustRunAfter(project.tasks.createReleaseTag)
+//            project.tasks.createReleaseTag.mustRunAfter(project.tasks.preTagCommit)
+            project.tasks.updateVersion.mustRunAfter(project.tasks.preTagCommit)
             project.tasks.commitNewVersion.mustRunAfter(project.tasks.updateVersion)
         }
 
@@ -161,14 +159,17 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
      * @param directory the directory to start from
      */
     protected BaseScmAdapter findScmAdapter() {
+        log.debug("attempting to find appropriate scm adapter")
         BaseScmAdapter adapter
         File projectPath = project.projectDir.canonicalFile
 
         extension.scmAdapters.find {
+            log.debug("comparing $it to BaseScmAdapter")
             assert BaseScmAdapter.isAssignableFrom(it)
 
             BaseScmAdapter instance = it.getConstructor(Project.class, Map.class).newInstance(project, attributes)
             if (instance.isSupported(projectPath)) {
+                log.debug("project is of type $it")
                 adapter = instance
                 return true
             }
@@ -177,8 +178,7 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
         }
 
         if (adapter == null) {
-            throw new GradleException(
-                "No supported Adapter could be found. Are [${ projectPath }] or its parents are valid scm directories?")
+            throw new GradleException("No supported Adapter could be found. Are [${ projectPath }] or its parents are valid scm directories?")
         }
 
         adapter

@@ -133,7 +133,7 @@ class GitAdapter extends BaseScmAdapter {
         if (shouldPush()) {
             def branch = gitCurrentBranch()
             if (extension.git.pushToBranchPrefix) {
-                branch = "HEAD:${extension.git.pushToBranchPrefix}${branch}"
+                branch = "HEAD:${extension.git.pushToBranchPrefix}${project.version}"
             }
             exec(['git', 'push', '--porcelain', extension.git.pushToRemote, branch] + extension.git.pushOptions, directory: workingDirectory, errorMessage: 'Failed to push to remote', errorPatterns: ['[rejected]', 'error: ', 'fatal: '])
         }
