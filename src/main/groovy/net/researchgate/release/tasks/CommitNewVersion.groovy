@@ -12,6 +12,7 @@ class CommitNewVersion extends BaseReleaseTask {
 
     @TaskAction
     def commitNewVersion() {
+        def adapter = getScmAdapter()
         if (extension.isUseMultipleVersionFiles()) {
             String message = ""
             project.getSubprojects().each { Project subProject ->
@@ -27,13 +28,13 @@ class CommitNewVersion extends BaseReleaseTask {
                      message += " '${tagName(subProject)}'"
                 }
             }
-            getScmAdapter().commit(message + '.')
+            adapter.commit(message + '.')
         } else {
             String message = extension.newVersionCommitMessage + " '${tagName(project)}'."
             if (extension.preCommitText) {
                 message = "${extension.preCommitText} ${message}"
             }
-            getScmAdapter().commit(message)
+            adapter.commit(message)
         }
     }
 }

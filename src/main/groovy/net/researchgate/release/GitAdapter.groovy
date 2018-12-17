@@ -121,6 +121,7 @@ class GitAdapter extends BaseScmAdapter {
 
     @Override
     void commit(String message) {
+        println("committing with message $message")
         List<String> command = ['git', 'commit', '-m', message]
         if (extension.git.commitVersionFileOnly) {
             //TODO fix?
@@ -130,7 +131,11 @@ class GitAdapter extends BaseScmAdapter {
         }
 
         exec(command, directory: workingDirectory, errorPatterns: ['error: ', 'fatal: '])
+    }
 
+    @Override
+    void push() {
+        println("Pushing to Git Remote")
         if (shouldPush()) {
             def branch = gitCurrentBranch()
             if (extension.git.pushToBranchPrefix) {

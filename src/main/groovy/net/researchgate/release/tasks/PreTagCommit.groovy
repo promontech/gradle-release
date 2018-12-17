@@ -53,6 +53,7 @@ class PreTagCommit extends BaseReleaseTask {
                 scmAdapter.commit(message)
             }
         }
+        scmAdapter.push()
     }
 
 }

@@ -87,6 +87,10 @@ class HgAdapter extends BaseScmAdapter {
     @Override
     void commit(String message) {
         exec(['hg', 'ci', '-m', message], errorMessage: 'Error committing new version', errorPatterns: [ERROR])
+    }
+
+    @Override
+    void push() {
         exec(['hg', 'push'], errorMessage: 'Error committing new version', errorPatterns: [ERROR])
     }
 

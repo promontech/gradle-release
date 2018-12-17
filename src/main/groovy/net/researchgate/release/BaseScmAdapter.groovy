@@ -36,6 +36,8 @@ abstract class BaseScmAdapter extends PluginHelper {
 
     abstract void commit(String message)
 
+    abstract void push()
+
     abstract void revert(File file)
 
     abstract String getLatestTag(String projectName)

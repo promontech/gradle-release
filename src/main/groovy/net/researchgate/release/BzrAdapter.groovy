@@ -122,6 +122,10 @@ class BzrAdapter extends BaseScmAdapter {
     @Override
     void commit(String message) {
         exec(['bzr', 'ci', '-m', message], errorMessage: 'Error committing new version', errorPatterns: [ERROR])
+    }
+
+    @Override
+    void push() {
         exec(['bzr', 'push', ':parent'], errorMessage: 'Error committing new version', errorPatterns: [ERROR])
     }
 

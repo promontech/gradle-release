@@ -158,6 +158,11 @@ class SvnAdapter extends BaseScmAdapter {
     }
 
     @Override
+    void push() {
+        // no op
+    }
+
+    @Override
     void add(File file) {
         svnExec(['add', file.path], errorMessage: "Error adding file ${file.name}", errorPatterns: ['warning:'])
     }
