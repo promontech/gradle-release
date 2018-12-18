@@ -139,20 +139,21 @@ class GitAdapter extends BaseScmAdapter {
     void push(BranchType branchType, Boolean shouldPushToReleaseOrHotfix) {
         println("Pushing to Git Remote")
         if (shouldPush()) {
+            println("shouldPush() is true")
             def branch = gitCurrentBranch()
             exec(['git', 'push', '--porcelain', extension.git.pushToRemote, branch] + extension.git.pushOptions, directory: workingDirectory, errorMessage: 'Failed to push to remote', errorPatterns: ['[rejected]', 'error: ', 'fatal: '])
 
-//            if (shouldPushToReleaseOrHotfix) {
+            if (shouldPushToReleaseOrHotfix) {
+                println("shouldPushToReleaseOrHotfix is : $shouldPushToReleaseOrHotfix")
+                println("BRANCH TYPE IS $branchType")
                 if (branchType == BranchType.RELEASE) {
-                    println("BRANCH TYPE IS RELEASE")
                     branch = "HEAD:${extension.git.releaseBranchPrefix}${project.version.replaceAll('-SNAPSHOT', '')}"
                     exec(['git', 'push', '--porcelain', extension.git.pushToRemote, branch] + extension.git.pushOptions, directory: workingDirectory, errorMessage: 'Failed to push to remote', errorPatterns: ['[rejected]', 'error: ', 'fatal: '])
                 } else if (branchType == BranchType.HOTFIX) {
-                    println("BRANCH TYPE IS HOTFIX")
                     branch = "HEAD:${extension.git.hotfixBranchPrefix}${project.version.replaceAll('-SNAPSHOT', '')}"
                     exec(['git', 'push', '--porcelain', extension.git.pushToRemote, branch] + extension.git.pushOptions, directory: workingDirectory, errorMessage: 'Failed to push to remote', errorPatterns: ['[rejected]', 'error: ', 'fatal: '])
                 }
-//            }
+            }
         }
     }
 

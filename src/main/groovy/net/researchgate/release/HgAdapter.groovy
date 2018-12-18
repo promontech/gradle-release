@@ -90,7 +90,7 @@ class HgAdapter extends BaseScmAdapter {
     }
 
     @Override
-    void push(BranchType branchType) {
+    void push(BranchType branchType, Boolean shouldPushToReleaseOrHotfix) {
         exec(['hg', 'push'], errorMessage: 'Error committing new version', errorPatterns: [ERROR])
     }
 

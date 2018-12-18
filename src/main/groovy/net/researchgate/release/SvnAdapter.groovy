@@ -158,7 +158,7 @@ class SvnAdapter extends BaseScmAdapter {
     }
 
     @Override
-    void push(BranchType branchType) {
+    void push(BranchType branchType, Boolean shouldPushToReleaseOrHotfix) {
         // no op
     }
 

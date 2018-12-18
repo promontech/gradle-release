@@ -30,7 +30,7 @@ class BzrAdapter extends BaseScmAdapter {
     @Override
     boolean isSupported(File directory) {
         if (!directory.list().grep('.bzr')) {
-            return directory.parentFile? isSupported(directory.parentFile) : false
+            return directory.parentFile ? isSupported(directory.parentFile) : false
         }
 
         true
@@ -61,8 +61,8 @@ class BzrAdapter extends BaseScmAdapter {
 
         def c = { String name ->
             ["${name.capitalize()}:",
-                    xml."$name".file.collect { it.text().trim() },
-                    xml."$name".directory.collect { it.text().trim() }].
+             xml."$name".file.collect { it.text().trim() },
+             xml."$name".directory.collect { it.text().trim() }].
                     flatten().
                     join(DELIM) + '\n'
         }
@@ -88,16 +88,16 @@ class BzrAdapter extends BaseScmAdapter {
         Closure c = {
             int number, String name, String path ->
 
-            ["You have $number $name changes${ number == 1 ? '' : 's' }:",
-                    xml."$path".logs.log.collect {
-                        int cutPosition = 40
-                        String message = it.message.text()
-                        message = message.readLines()[0].substring(0, Math.min(cutPosition, message.size())) +
-                                (message.size() > cutPosition ? ' ..' : '')
-                        "[$it.revno]: [$it.timestamp][$it.committer][$message]"
-                    }].
-                    flatten().
-                    join(DELIM)
+                ["You have $number $name changes${number == 1 ? '' : 's'}:",
+                 xml."$path".logs.log.collect {
+                     int cutPosition = 40
+                     String message = it.message.text()
+                     message = message.readLines()[0].substring(0, Math.min(cutPosition, message.size())) +
+                             (message.size() > cutPosition ? ' ..' : '')
+                     "[$it.revno]: [$it.timestamp][$it.committer][$message]"
+                 }].
+                        flatten().
+                        join(DELIM)
         }
 
         if (extra > 0) {
@@ -125,7 +125,7 @@ class BzrAdapter extends BaseScmAdapter {
     }
 
     @Override
-    void push(BranchType branchType) {
+    void push(BranchType branchType, Boolean shouldPushToReleaseOrHotfix) {
         exec(['bzr', 'push', ':parent'], errorMessage: 'Error committing new version', errorPatterns: [ERROR])
     }
 

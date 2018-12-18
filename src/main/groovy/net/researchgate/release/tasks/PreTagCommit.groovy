@@ -1,6 +1,7 @@
 package net.researchgate.release.tasks
 
 import net.researchgate.release.BaseScmAdapter
+import net.researchgate.release.BranchType
 import net.researchgate.release.ReleaseExtension
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
@@ -53,7 +54,7 @@ class PreTagCommit extends BaseReleaseTask {
                 scmAdapter.commit(message)
             }
         }
-        scmAdapter.push(extension.getOrCreateProjectAttributes(project.name).branchType)
+        scmAdapter.push(extension.getOrCreateProjectAttributes(project.name).branchType as BranchType, true)
     }
 
 }

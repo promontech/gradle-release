@@ -1,5 +1,6 @@
 package net.researchgate.release.tasks
 
+import net.researchgate.release.BranchType
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 
@@ -36,5 +37,6 @@ class CommitNewVersion extends BaseReleaseTask {
             }
             adapter.commit(message)
         }
+        adapter.push(extension.getOrCreateProjectAttributes(project.name).branchType as BranchType, false)
     }
 }
