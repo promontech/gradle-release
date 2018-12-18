@@ -125,7 +125,7 @@ class BzrAdapter extends BaseScmAdapter {
     }
 
     @Override
-    void push() {
+    void push(BranchType branchType) {
         exec(['bzr', 'push', ':parent'], errorMessage: 'Error committing new version', errorPatterns: [ERROR])
     }
 

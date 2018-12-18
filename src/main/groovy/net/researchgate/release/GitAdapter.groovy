@@ -37,6 +37,8 @@ class GitAdapter extends BaseScmAdapter {
         @Deprecated
         boolean pushToCurrentBranch = false
         String pushToBranchPrefix
+        String releaseBranchPrefix = 'release/'
+        String hotfixBranchPrefix = 'hotfix/'
         boolean commitVersionFileOnly = false
 
         void setProperty(String name, Object value) {
@@ -134,14 +136,23 @@ class GitAdapter extends BaseScmAdapter {
     }
 
     @Override
-    void push() {
+    void push(BranchType branchType, Boolean shouldPushToReleaseOrHotfix) {
         println("Pushing to Git Remote")
         if (shouldPush()) {
             def branch = gitCurrentBranch()
-            if (extension.git.pushToBranchPrefix) {
-                branch = "HEAD:${extension.git.pushToBranchPrefix}${project.version.replaceAll('-SNAPSHOT', '')}"
-            }
             exec(['git', 'push', '--porcelain', extension.git.pushToRemote, branch] + extension.git.pushOptions, directory: workingDirectory, errorMessage: 'Failed to push to remote', errorPatterns: ['[rejected]', 'error: ', 'fatal: '])
+
+//            if (shouldPushToReleaseOrHotfix) {
+                if (branchType == BranchType.RELEASE) {
+                    println("BRANCH TYPE IS RELEASE")
+                    branch = "HEAD:${extension.git.releaseBranchPrefix}${project.version.replaceAll('-SNAPSHOT', '')}"
+                    exec(['git', 'push', '--porcelain', extension.git.pushToRemote, branch] + extension.git.pushOptions, directory: workingDirectory, errorMessage: 'Failed to push to remote', errorPatterns: ['[rejected]', 'error: ', 'fatal: '])
+                } else if (branchType == BranchType.HOTFIX) {
+                    println("BRANCH TYPE IS HOTFIX")
+                    branch = "HEAD:${extension.git.hotfixBranchPrefix}${project.version.replaceAll('-SNAPSHOT', '')}"
+                    exec(['git', 'push', '--porcelain', extension.git.pushToRemote, branch] + extension.git.pushOptions, directory: workingDirectory, errorMessage: 'Failed to push to remote', errorPatterns: ['[rejected]', 'error: ', 'fatal: '])
+                }
+//            }
         }
     }
 

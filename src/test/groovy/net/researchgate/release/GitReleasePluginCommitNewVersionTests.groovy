@@ -17,6 +17,14 @@ class GitReleasePluginCommitNewVersionTests extends GitSpecification {
 
     Project project
 
+    FileFilter filter = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+            String name = pathname.getName().toLowerCase();
+            return name.endsWith(".properties") && pathname.isFile();
+        }
+    }
+
     def setup() {
         project = ProjectBuilder.builder().withName("GitReleasePluginTest").withProjectDir(localGit.repository.workTree).build()
         project.version = "1.1"
@@ -34,9 +42,9 @@ class GitReleasePluginCommitNewVersionTests extends GitSpecification {
         project.file('gradle.properties').withWriter { it << "version=${project.version}" }
         when:
         project.commitNewVersion.execute()
-        gitHardReset(remoteGit)
+        gitHardReset(localGit)
         then: 'remote repo contains updated properties file'
-        remoteGit.repository.workTree.listFiles().any { it.name == 'gradle.properties' && it.text.contains("version=$project.version") }
+        localGit.repository.workTree.listFiles(filter).any { it.text.contains("version=$project.version") }
     }
 
     def 'should push new version to branch using the branch prefix when it is specified'() {
@@ -47,7 +55,7 @@ class GitReleasePluginCommitNewVersionTests extends GitSpecification {
         project.commitNewVersion.execute()
         gitCheckoutBranch(remoteGit, "refs/for/${project.version}")
         then: 'remote repo contains updated properties file'
-        remoteGit.repository.workTree.listFiles().any { it.name == 'gradle.properties' && it.text.contains("version=$project.version") }
+        remoteGit.repository.workTree.listFiles(filter).any { it.text.contains("version=$project.version") }
     }
 
     def 'should only push the version file to branch when pushVersionFileOnly is true'() {
@@ -62,7 +70,7 @@ class GitReleasePluginCommitNewVersionTests extends GitSpecification {
         project.commitNewVersion.execute()
         gitHardReset(remoteGit)
         then: 'remote repo does not get the .gitignore update'
-        remoteGit.repository.workTree.listFiles().any { it.name == 'gradle.properties' && it.text.contains("version=$project.version") }
+        remoteGit.repository.workTree.listFiles(filter).any { it.text.contains("version=$project.version") }
         ! remoteGit.repository.workTree.listFiles().any { it.name == 'test.txt' && it.text.contains('testTarget') }
     }
 }

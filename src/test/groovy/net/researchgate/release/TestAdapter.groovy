@@ -53,6 +53,10 @@ class TestAdapter extends BaseScmAdapter {
     }
 
     @Override
+    void push(BranchType branchType) {
+    }
+
+    @Override
     void revert(File file) {
 
     }
