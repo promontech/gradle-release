@@ -5,7 +5,17 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.GradleBuild
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * Checks submodules to see if they should be released
+ *
+ * Only applies if the plugin is set to use multiple version files.
+ */
 class CheckReleaseNeeded extends BaseReleaseTask {
+
+    CheckReleaseNeeded() {
+        super()
+        description = 'Checks submodules to see if they should be released. Only applies if the plugin is set to use multiple version files.'
+    }
 
     @TaskAction
     void checkReleaseNeeded() {

@@ -65,6 +65,33 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             ]
         }
 
+        project.task('promote', description: 'Promote project: tag and push stage artifact to release repo.', group: RELEASE_GROUP, type: GradleBuild) {
+            startParameter = project.getGradle().startParameter.newInstance()
+            startParameter.projectProperties.put('release.releasing', "true")
+
+            /**
+             *  We use a separate 'runBuildTasks' GradleBuild process since we only have access to the extension
+             *  properties after the project has been evaluated to decide which tasks to also include in the build.
+             */
+            tasks = [
+                    "${rootPath}createScmAdapter" as String,
+                    "${rootPath}initScmAdapter" as String,
+                    "${rootPath}checkReleaseNeeded" as String,
+                    "${rootPath}checkCommitNeeded" as String,
+                    "${rootPath}checkUpdateNeeded" as String,
+//                    "${rootPath}prepareVersions" as String,
+//                    "${rootPath}unSnapshotVersion" as String,
+//                    "${rootPath}confirmReleaseVersion" as String, // Release is already created. Current project.version should be correct. TODO. we could check that project.version matches branch name
+                    "${rootPath}checkSnapshotDependencies" as String,
+                    "${rootPath}runBuildTasks" as String,
+//                    "${rootPath}preTagCommit" as String, // no changes should have been made to the project.
+                    "${rootPath}promoteToRelease" as String,
+                    "${rootPath}createReleaseTag" as String,
+//                    "${rootPath}updateVersion" as String, // No changes should be made
+//                    "${rootPath}commitNewVersion" as String // No changes should be made
+            ]
+        }
+
         // The SCM adapter is created in the plugin context since its needed to revert changes on task failure
 
         project.tasks.create('initScmAdapter', InitScmAdapter)
