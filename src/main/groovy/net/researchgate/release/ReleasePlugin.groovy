@@ -49,6 +49,7 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
              */
             tasks = [
                     "${rootPath}createScmAdapter" as String,
+                    "${rootPath}setRelease" as String,
                     "${rootPath}initScmAdapter" as String,
                     "${rootPath}checkReleaseNeeded" as String,
                     "${rootPath}checkCommitNeeded" as String,
@@ -98,6 +99,7 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
         project.task('createScmAdapter', group: RELEASE_GROUP,
                 description: 'Finds the correct SCM plugin') doLast this.&createScmAdapter
         project.tasks.create('checkReleaseNeeded', CheckReleaseNeeded)
+        project.tasks.create('setRelease', SetRelease)
         project.tasks.create('checkCommitNeeded', CheckCommitNeeded)
         project.tasks.create('checkUpdateNeeded', CheckUpdateNeeded)
         project.tasks.create('prepareVersions', PrepareVersions)

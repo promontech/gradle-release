@@ -1,6 +1,6 @@
 package net.researchgate.release.tasks
 
-import net.researchgate.release.BranchType
+
 import org.gradle.api.tasks.TaskAction
 
 import javax.inject.Inject
@@ -15,8 +15,6 @@ class ConfirmReleaseVersion extends BaseReleaseTask {
 
     @TaskAction
     def confirmReleaseVersion() {
-        Map<String, Object> projectAttributes = extension.getOrCreateProjectAttributes(project.name)
-        projectAttributes.branchType = BranchType.RELEASE
         if (extension.isUseMultipleVersionFiles()) {
             rootProject.subprojects
                     .findAll { subProject -> !extension.skipRelease(subProject)}
@@ -27,11 +25,11 @@ class ConfirmReleaseVersion extends BaseReleaseTask {
                         updateVersionProperty(subProject, getReleaseVersion(subProject))
                     }
         } else {
+            Map<String, Object> projectAttributes = extension.getOrCreateProjectAttributes(project.name)
             if (projectAttributes.propertiesFileCreated) {
                 return
             }
             updateVersionProperty(rootProject, getReleaseVersion(rootProject))
         }
     }
-
 }
