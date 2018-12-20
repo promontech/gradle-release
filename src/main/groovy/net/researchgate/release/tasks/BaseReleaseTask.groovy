@@ -155,6 +155,19 @@ class BaseReleaseTask extends DefaultTask {
         return readLine("This release version for " + project.name + ":", releaseVersion ?: candidateVersion)
     }
 
+    String getTagVersion(Project project, String candidateVersion = null) {
+//        if (tagVersion != null) {
+//            return tagVersion
+        /*} else*/ if (useAutomaticVersion() && candidateVersion != null) {
+            return candidateVersion
+        }
+
+        if (candidateVersion == null) {
+            candidateVersion = scmAdapter.getLatestTag('')
+        }
+        return readLine("The tag to branch the hotfix from for " + project.name + ":", candidateVersion)
+    }
+
     /**
      * Updates properties file (<code>gradle.properties</code> by default) with new version specified.
      * If configured in plugin convention then updates other properties in file additionally to <code>version</code> property

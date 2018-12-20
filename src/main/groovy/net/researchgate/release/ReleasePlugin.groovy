@@ -66,6 +66,31 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             ]
         }
 
+        project.task('hotfix', description: 'Request tag to create hotfix from and create hotfix branch', group: RELEASE_GROUP, type: GradleBuild) {
+            startParameter = project.getGradle().startParameter.newInstance()
+            startParameter.projectProperties.put('release.releasing', "true")
+
+            /**
+             *  We use a separate 'runBuildTasks' GradleBuild process since we only have access to the extension
+             *  properties after the project has been evaluated to decide which tasks to also include in the build.
+             */
+            tasks = [
+                    "${rootPath}createScmAdapter" as String,
+                    "${rootPath}setHotfix" as String,
+                    "${rootPath}initScmAdapter" as String,
+                    "${rootPath}checkReleaseNeeded" as String,
+                    "${rootPath}checkCommitNeeded" as String,
+                    "${rootPath}checkUpdateNeeded" as String,
+                    "${rootPath}getTagVersion" as String,
+                    "${rootPath}checkSnapshotDependencies" as String,
+                    "${rootPath}runBuildTasks" as String,
+                    "${rootPath}preTagCommit" as String,
+//                    "${rootPath}createReleaseTag" as String,
+                    "${rootPath}updateVersion" as String,
+                    "${rootPath}commitNewVersion" as String
+            ]
+        }
+
         project.task('promote', description: 'Promote project: tag and push stage artifact to release repo.', group: RELEASE_GROUP, type: GradleBuild) {
             startParameter = project.getGradle().startParameter.newInstance()
             startParameter.projectProperties.put('release.releasing', "true")
@@ -80,16 +105,10 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
                     "${rootPath}checkReleaseNeeded" as String,
                     "${rootPath}checkCommitNeeded" as String,
                     "${rootPath}checkUpdateNeeded" as String,
-//                    "${rootPath}prepareVersions" as String,
-//                    "${rootPath}unSnapshotVersion" as String,
 //                    "${rootPath}confirmReleaseVersion" as String, // Release is already created. Current project.version should be correct. TODO. we could check that project.version matches branch name
                     "${rootPath}checkSnapshotDependencies" as String,
                     "${rootPath}runBuildTasks" as String,
-//                    "${rootPath}preTagCommit" as String, // no changes should have been made to the project.
-                    "${rootPath}promoteToRelease" as String,
                     "${rootPath}createReleaseTag" as String,
-//                    "${rootPath}updateVersion" as String, // No changes should be made
-//                    "${rootPath}commitNewVersion" as String // No changes should be made
             ]
         }
 
@@ -100,6 +119,8 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
                 description: 'Finds the correct SCM plugin') doLast this.&createScmAdapter
         project.tasks.create('checkReleaseNeeded', CheckReleaseNeeded)
         project.tasks.create('setRelease', SetRelease)
+        project.tasks.create('setHotfix', SetHotfix)
+        project.tasks.create('getTagVersion', GetTagVersion)
         project.tasks.create('checkCommitNeeded', CheckCommitNeeded)
         project.tasks.create('checkUpdateNeeded', CheckUpdateNeeded)
         project.tasks.create('prepareVersions', PrepareVersions)
@@ -161,7 +182,8 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
             if (state.failure && task.name == "release") {
                 try {
                     createScmAdapter()
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
                 if (scmAdapter && extension.revertOnFail) {
                     if (project.file(extension.versionPropertyFile)?.exists()) {
                         log.error('Release process failed, reverting back any changes made by Release Plugin to ' + project.name)
@@ -207,7 +229,7 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
         }
 
         if (adapter == null) {
-            throw new GradleException("No supported Adapter could be found. Are [${ projectPath }] or its parents are valid scm directories?")
+            throw new GradleException("No supported Adapter could be found. Are [${projectPath}] or its parents are valid scm directories?")
         }
 
         adapter
