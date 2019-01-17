@@ -53,7 +53,8 @@ class TestAdapter extends BaseScmAdapter {
     }
 
     @Override
-    void push(BranchType branchType) {
+    void push(BranchType branchType, Boolean shouldPushToReleaseOrHotfix) {
+
     }
 
     @Override
