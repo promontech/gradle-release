@@ -22,6 +22,9 @@ group='net.researchgate'
 
 repositories {
     mavenCentral()
+    maven {
+        url "http://nexus.corp.promontech.com/repository/pt-maven-stage/"
+    }
 }
 
 dependencies {
@@ -60,29 +63,42 @@ release {
     }
 }
 
-bintray {
-    user = project.hasProperty('bintrayUser') ? bintrayUser : ''
-    key = project.hasProperty('bintrayApiKey') ? bintrayApiKey : ''
-    publications = ['gradleReleasePublication']
-    pkg {
-        name = project.name
-        repo = 'gradle-plugins'
-        userOrg = 'researchgate'
-        licenses = ['MIT']
-        version {
-            name = "${project.version}"
-            vcsTag = "${project.version}"
-            gpg {
-                sign = false
+//bintray {
+//    user = project.hasProperty('bintrayUser') ? bintrayUser : ''
+//    key = project.hasProperty('bintrayApiKey') ? bintrayApiKey : ''
+//    publications = ['gradleReleasePublication']
+//    pkg {
+//        name = project.name
+//        repo = 'gradle-plugins'
+//        userOrg = 'researchgate'
+//        licenses = ['MIT']
+//        version {
+//            name = "${project.version}"
+//            vcsTag = "${project.version}"
+//            gpg {
+//                sign = false
+//            }
+//            mavenCentralSync {
+//                sync = false
+//                user = project.hasProperty('sonatypeUser') ? sonatypeUser : ''
+//                password = project.hasProperty('sonatypePassword') ? sonatypePassword : ''
+//            }
+//        }
+//    }
+//    publish = false
+//}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "http://localhost:8081/nexus/content/repositories/snapshots") {
+                authentication(userName: "admin", password: "admin123")
             }
-            mavenCentralSync {
-                sync = false
-                user = project.hasProperty('sonatypeUser') ? sonatypeUser : ''
-                password = project.hasProperty('sonatypePassword') ? sonatypePassword : ''
-            }
+            pom.version = "1.0-SNAPSHOT"
+            pom.artifactId = "simple-project"
+            pom.groupId = "com.example"
         }
     }
-    publish = false
 }
 
 afterReleaseBuild.dependsOn bintrayUpload
