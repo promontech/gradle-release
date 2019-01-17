@@ -56,7 +56,7 @@ gradlePlugin {
 
 release {
     git {
-        requireBranch = '(master|\\d+\\.\\d+)'
+        requireBranch = '(master|\\d+\\.\\d+|\\d+\\.+\\D)'
     }
 }
 
