@@ -86,3 +86,17 @@ publishing {
 
 tasks["publish"].dependsOn("assemble")
 tasks["publishToMavenLocal"].dependsOn("assemble")
+
+val jar: Jar by tasks
+val prepareTestJar = tasks.create<Copy>("prepareTestJar") {
+    dependsOn(jar)
+    from(jar)
+    into("${buildDir}/tmp/testJars/")
+    rename(".*", "gradle-release-0.0.0.jar")
+}
+tasks {
+    val test by getting {
+        dependsOn(prepareTestJar)
+//        maxParallelForks = 2
+    }
+}
