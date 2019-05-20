@@ -84,6 +84,7 @@ class GitAdapter extends BaseScmAdapter {
         def status = gitStatus()
 
         if (status[UNVERSIONED]) {
+            println(extension.failOnUnversionedFiles)
             warnOrThrow(extension.failOnUnversionedFiles,
                     (['You have unversioned files:', LINE, *status[UNVERSIONED], LINE] as String[]).join('\n'))
         }

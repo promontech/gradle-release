@@ -60,6 +60,8 @@ fun getCredentials(prop: String) = credentials.getProperty(prop) as String?
 
 publishing {
     val version = project.version.toString()
+    println("LJKASDFLJKASLDFJK")
+    println(getCredentials("nexusSnapshotDeployUrl"))
     val (_username, _password, _url) = when {
         version.endsWith("-SNAPSHOT") -> Triple(
             getCredentials("nexusSnapshotUsername"),
