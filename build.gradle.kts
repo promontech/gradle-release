@@ -12,6 +12,7 @@ buildscript {
 }
 
 plugins {
+    `kotlin-dsl`
     id("org.gradle.java-gradle-plugin")
     id("org.gradle.groovy")
     id("maven-publish")
@@ -60,8 +61,6 @@ fun getCredentials(prop: String) = credentials.getProperty(prop) as String?
 
 publishing {
     val version = project.version.toString()
-    println("LJKASDFLJKASLDFJK")
-    println(getCredentials("nexusSnapshotDeployUrl"))
     val (_username, _password, _url) = when {
         version.endsWith("-SNAPSHOT") -> Triple(
             getCredentials("nexusSnapshotUsername"),
@@ -87,7 +86,7 @@ publishing {
 tasks["publish"].dependsOn("assemble")
 tasks["publishToMavenLocal"].dependsOn("assemble")
 
-val jar: Jar by tasks
+val jar  = tasks["jar"] as Jar
 val prepareTestJar = tasks.create<Copy>("prepareTestJar") {
     dependsOn(jar)
     from(jar)
