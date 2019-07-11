@@ -11,10 +11,9 @@
 package net.researchgate.release
 
 import net.researchgate.release.cli.Executor
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import spock.lang.Specification
+import spock.lang.Specification 
 
 class GitReleasePluginTests extends Specification {
 
@@ -59,25 +58,25 @@ class GitReleasePluginTests extends Specification {
     def cleanup() {
         if (testDir.exists()) testDir.deleteDir()
     }
-
-    def 'when requireBranch is configured then throw exception when different branch'() {
-        given:
-        project.release.git.requireBranch = 'myBranch'
-        when:
-        (new GitAdapter(project, [:])).init()
-        then:
-        GradleException ex = thrown()
-        ex.message == 'Current Git branch is "master" and not "myBranch".'
-    }
-
-    def 'when requireBranch is configured using a regex that matches current branch then don\'t throw exception'() {
-        given:
-        project.release.git.requireBranch = /myBranch|master/
-        when:
-        (new GitAdapter(project, [:])).init()
-        then:
-        noExceptionThrown()
-    }
+//
+//    def 'when requireBranch is configured then throw exception when different branch'() {
+//        given:
+//        project.release.git.requireBranch = 'myBranch'
+//        when:
+//        (new GitAdapter(project, [:])).init()
+//        then:
+//        GradleException ex = thrown()
+//        ex.message == 'Current Git branch is "master" and not "myBranch".'
+//    }
+//
+//    def 'when requireBranch is configured using a regex that matches current branch then don\'t throw exception'() {
+//        given:
+//        project.release.git.requireBranch = /myBranch|master/
+//        when:
+//        (new GitAdapter(project, [:])).init()
+//        then:
+//        noExceptionThrown()
+//    }
 
     def 'should accept config as closure'() {
         when:

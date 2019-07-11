@@ -10,7 +10,7 @@
 
 package net.researchgate.release
 
-
+import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -73,35 +73,35 @@ class MultiVersionsCheckCommitNeededTests extends GitSpecification {
     }
 
 
-//    def 'Uncommited file should cause exception'() {
-//        given: 'multimodule project'
-//
-//        gitAddAndCommit(localGit, "subproject1/gradle.properties") { it << "version=$subproject1.version" }
-//        gitAddAndCommit(localGit, "subproject2/gradle.properties") { it << "version=$subproject2.version" }
-//
-//        project.file('untracked.txt').withWriter { it << "untracked" }
-//
-//        project.release {
-//            useMultipleVersionFiles = true
-//        }
-//
-//        localGit.push().setForce(true).call()
-//        when: 'calling release task indirectly'
-//        project.tasks['release'].tasks.each { task ->
-//
-//            if (task == ':runBuildTasks') {
-//                project.tasks.getByPath(task).tasks.each { buildTask ->
-//                    project.tasks.getByPath(buildTask).execute()
-//                }
-//            } else {
-//                project.tasks.getByPath(task).execute()
-//            }
-//        }
-//        def st = localGit.status().call()
-//        gitHardReset(remoteGit)
-//        then: 'Exception expected from an untracked file'
-//        GradleException ex = thrown()
-//        ex.cause.message.contains "You have unversioned files"
-//        ex.cause.message.contains "untracked.txt"
-//    }
+    def 'Uncommited file should cause exception'() {
+        given: 'multimodule project'
+
+        gitAddAndCommit(localGit, "subproject1/gradle.properties") { it << "version=$subproject1.version" }
+        gitAddAndCommit(localGit, "subproject2/gradle.properties") { it << "version=$subproject2.version" }
+
+        project.file('untracked.txt').withWriter { it << "untracked" }
+
+        project.release {
+            useMultipleVersionFiles = true
+        }
+
+        localGit.push().setForce(true).call()
+        when: 'calling release task indirectly'
+        project.tasks['release'].tasks.each { task ->
+
+            if (task == ':runBuildTasks') {
+                project.tasks.getByPath(task).tasks.each { buildTask ->
+                    project.tasks.getByPath(buildTask).execute()
+                }
+            } else {
+                project.tasks.getByPath(task).execute()
+            }
+        }
+        def st = localGit.status().call()
+        gitHardReset(remoteGit)
+        then: 'Exception expected from an untracked file'
+        GradleException ex = thrown()
+        ex.cause.message.contains "You have unversioned files"
+        ex.cause.message.contains "untracked.txt"
+    }
 }
