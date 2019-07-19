@@ -107,8 +107,8 @@ class ReleasePlugin extends PluginHelper implements Plugin<Project> {
                     "${rootPath}checkUpdateNeeded" as String,
 //                    "${rootPath}confirmReleaseVersion" as String, // Release is already created. Current project.version should be correct. TODO. we could check that project.version matches branch name
                     "${rootPath}checkSnapshotDependencies" as String,
-                    "${rootPath}runBuildTasks" as String,
                     "${rootPath}createReleaseTag" as String,
+                    "${rootPath}runBuildTasks" as String,
             ]
         }
 
